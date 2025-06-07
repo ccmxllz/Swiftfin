@@ -24,7 +24,7 @@ struct VideoPlayerSettingsView: View {
     var body: some View {
         Form {
 
-            ChevronButton(L10n.gestures) {
+            ChevronButton<EmptyView, EmptyView>(L10n.gestures) {
                 router.route(to: \.gestureSettings)
             }
 
@@ -52,6 +52,8 @@ struct VideoPlayerSettingsView: View {
             SliderSection()
 
             SubtitleSection()
+
+            DanmakuSection()
 
             TimestampSection()
 

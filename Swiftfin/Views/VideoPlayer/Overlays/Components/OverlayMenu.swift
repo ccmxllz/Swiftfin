@@ -96,6 +96,11 @@ extension VideoPlayer.Overlay {
         }
 
         @ViewBuilder
+        private var danmakuButton: some View {
+            DanmakuActionButton()
+        }
+
+        @ViewBuilder
         private var playbackSpeedMenu: some View {
             ActionButtons.PlaybackSpeedMenu {
                 HStack {
@@ -161,6 +166,8 @@ extension VideoPlayer.Overlay {
                         autoPlayButton
                     case .chapters:
                         chaptersButton
+                    case .danmaku:
+                        danmakuButton
                     case .playbackSpeed:
                         playbackSpeedMenu
                     case .playNextItem:

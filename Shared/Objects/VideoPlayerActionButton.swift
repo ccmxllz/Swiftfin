@@ -17,6 +17,7 @@ enum VideoPlayerActionButton: String, CaseIterable, Defaults.Serializable, Displ
     case audio
     case autoPlay
     case chapters
+    case danmaku
     case playbackSpeed
     case playNextItem
     case playPreviousItem
@@ -34,6 +35,8 @@ enum VideoPlayerActionButton: String, CaseIterable, Defaults.Serializable, Displ
             return L10n.autoPlay
         case .chapters:
             return L10n.chapters
+        case .danmaku:
+            return "弹幕"
         case .playbackSpeed:
             return L10n.playbackSpeed
         case .playNextItem:
@@ -61,6 +64,8 @@ enum VideoPlayerActionButton: String, CaseIterable, Defaults.Serializable, Displ
             return "play.circle.fill"
         case .chapters:
             return "list.bullet.circle"
+        case .danmaku:
+            return "bubble.left"
         case .playbackSpeed:
             return "speedometer"
         case .playNextItem:
@@ -84,6 +89,7 @@ enum VideoPlayerActionButton: String, CaseIterable, Defaults.Serializable, Displ
         .subtitles,
         .playbackSpeed,
         .chapters,
+        .danmaku,
 //        .advanced,
     ]
 }

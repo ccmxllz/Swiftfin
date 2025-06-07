@@ -10,6 +10,46 @@ import Defaults
 import Foundation
 import UIKit
 
+// MARK: - DanmakuTrackItem
+
+struct DanmakuTrackItem {
+    let width: CGFloat
+    let startTime: CGFloat
+    let duration: CGFloat
+    let speed: CGFloat
+
+    // 弹幕头部到达屏幕左边缘的时间
+    var headExitTime: CGFloat {
+        startTime + (containerWidth / speed)
+    }
+
+    // 弹幕尾部离开屏幕右边缘的时间
+    var tailExitTime: CGFloat {
+        startTime + ((containerWidth + width) / speed)
+    }
+
+    // 当前弹幕的位置（从右边缘开始）
+    func currentPosition(at time: CGFloat, containerWidth: CGFloat) -> CGFloat {
+        let elapsed = time - startTime
+        return containerWidth - (speed * elapsed)
+    }
+
+    // 弹幕尾部的位置
+    func tailPosition(at time: CGFloat, containerWidth: CGFloat) -> CGFloat {
+        currentPosition(at: time, containerWidth: containerWidth) + width
+    }
+
+    private let containerWidth: CGFloat
+
+    init(width: CGFloat, startTime: CGFloat, duration: CGFloat, speed: CGFloat, containerWidth: CGFloat) {
+        self.width = width
+        self.startTime = startTime
+        self.duration = duration
+        self.speed = speed
+        self.containerWidth = containerWidth
+    }
+}
+
 // MARK: - DanmakuRenderer
 
 final class DanmakuRenderer {
@@ -25,7 +65,15 @@ final class DanmakuRenderer {
     // 弹幕轨道管理
     private var trackCount: Int = 4
     private var trackHeights: [CGFloat] = []
-    private var trackOccupiedUntil: [CGFloat] = []
+
+    // 简化的轨道管理：只记录每个轨道的最后弹幕结束时间
+    private var trackEndTimes: [CGFloat] = []
+
+    // 弹幕显示区域
+    private var displayAreaRatio: CGFloat = 0.5
+    private var displayAreaPosition: String = "top"
+    private var displayAreaHeight: CGFloat = 0
+    private var displayAreaOffsetY: CGFloat = 0
 
     // 对象池
     private var labelPool: [UILabel] = []
@@ -67,6 +115,16 @@ final class DanmakuRenderer {
         speedMultiplier = multiplier
     }
 
+    func setDisplayArea(ratio: CGFloat, position: String) {
+        displayAreaRatio = ratio
+        displayAreaPosition = position
+        setupTracks()
+    }
+
+    func updateSettings() {
+        setupTracks()
+    }
+
     func addDanmakuItems(_ items: [DanmakuItem]) {
         guard isEnabled, !items.isEmpty else { return }
 
@@ -92,15 +150,34 @@ final class DanmakuRenderer {
     // MARK: - Private Methods
 
     private func setupTracks() {
-        trackCount = Defaults[.Danmaku.trackCount]
-        let trackHeight = containerSize.height / CGFloat(trackCount)
+        trackCount = Defaults[.VideoPlayer.Overlay.danmakuTrackCount]
+        displayAreaRatio = CGFloat(Defaults[.VideoPlayer.Overlay.danmakuDisplayArea])
+        displayAreaPosition = Defaults[.VideoPlayer.Overlay.danmakuAreaPosition]
 
+        // 计算显示区域
+        displayAreaHeight = containerSize.height * displayAreaRatio
+
+        switch displayAreaPosition {
+        case "top":
+            displayAreaOffsetY = 0
+        case "bottom":
+            displayAreaOffsetY = containerSize.height - displayAreaHeight
+        case "full":
+            displayAreaHeight = containerSize.height
+            displayAreaOffsetY = 0
+        default:
+            displayAreaOffsetY = 0
+        }
+
+        let trackHeight = displayAreaHeight / CGFloat(trackCount)
         trackHeights = Array(repeating: trackHeight, count: trackCount)
         resetTracks()
+
+        print("🎯 弹幕显示区域设置: 位置=\(displayAreaPosition), 比例=\(displayAreaRatio), 高度=\(displayAreaHeight), 偏移=\(displayAreaOffsetY)")
     }
 
     private func resetTracks() {
-        trackOccupiedUntil = Array(repeating: 0, count: trackCount)
+        trackEndTimes = Array(repeating: 0, count: trackCount)
     }
 
     private func setupLabelPool() {
@@ -153,7 +230,7 @@ final class DanmakuRenderer {
 
         // 设置文本和样式
         let fontSize = fontConfig.adjustFontSize(
-            baseSize: CGFloat(Defaults[.Danmaku.fontSize]),
+            baseSize: CGFloat(Defaults[.VideoPlayer.Overlay.danmakuFontSize]),
             content: item.content
         )
         let font = fontConfig.getBestAvailableFont(size: fontSize)
@@ -167,9 +244,14 @@ final class DanmakuRenderer {
         let textWidth = fontConfig.calculateTextWidth(text: item.content, font: font)
         let textHeight = font.lineHeight
 
-        // 选择轨道
-        let trackIndex = selectBestTrack(for: textWidth)
-        let yPosition = CGFloat(trackIndex) * trackHeights[trackIndex] + (trackHeights[trackIndex] - textHeight) / 2
+        // 基于轨道的分配算法
+        let currentTime = CGFloat(CACurrentMediaTime())
+        let trackIndex = selectOptimalTrack(currentTime: currentTime)
+        let yPosition = displayAreaOffsetY + CGFloat(trackIndex) * trackHeights[trackIndex] + (trackHeights[trackIndex] - textHeight) / 2
+
+        print(
+            "🎯 弹幕 '\(item.content)' 分配到轨道 \(trackIndex), Y位置: \(yPosition) (显示区域: \(displayAreaOffsetY)-\(displayAreaOffsetY + displayAreaHeight))"
+        )
 
         // 设置初始位置
         label.frame = CGRect(
@@ -181,14 +263,24 @@ final class DanmakuRenderer {
 
         containerView.addSubview(label)
 
-        // 计算动画时长
-        let distance = containerSize.width + textWidth
-        let baseDuration: TimeInterval = 8.0
-        let duration = baseDuration / Double(speedMultiplier)
+        // 统一的弹幕参数：所有弹幕相同速度
+        let duration: TimeInterval = 8.0 // 固定8秒
+        let speed = (containerSize.width + textWidth) / CGFloat(duration)
 
-        // 更新轨道占用时间
-        let occupiedTime = CGFloat(duration) * (textWidth / distance)
-        trackOccupiedUntil[trackIndex] = max(trackOccupiedUntil[trackIndex], occupiedTime)
+        // 计算这个弹幕的实际开始时间和结束时间
+        let danmakuStartTime = max(currentTime, trackEndTimes[trackIndex])
+        let danmakuEndTime = danmakuStartTime + CGFloat(duration)
+
+        // 更新轨道结束时间
+        trackEndTimes[trackIndex] = danmakuEndTime
+
+        print("🎬 弹幕分配:")
+        print("   轨道: \(trackIndex)")
+        print("   当前时间: \(String(format: "%.2f", currentTime))")
+        print("   开始时间: \(String(format: "%.2f", danmakuStartTime))")
+        print("   结束时间: \(String(format: "%.2f", danmakuEndTime))")
+        print("   延迟: \(String(format: "%.2f", danmakuStartTime - currentTime))秒")
+        print("   速度: \(String(format: "%.2f", speed)) (统一)")
 
         // 创建显示项
         let displayItem = DanmakuDisplayItem(
@@ -198,11 +290,14 @@ final class DanmakuRenderer {
         )
         activeDanmakus.append(displayItem)
 
-        // 执行动画
+        // 计算延迟时间
+        let delayTime = danmakuStartTime - currentTime
+
+        // 执行动画（可能有延迟）
         UIView.animate(
             withDuration: duration,
-            delay: 0,
-            options: [.linear, .allowUserInteraction],
+            delay: TimeInterval(delayTime),
+            options: [.curveLinear, .allowUserInteraction],
             animations: {
                 label.frame.origin.x = -textWidth
             },
@@ -215,19 +310,31 @@ final class DanmakuRenderer {
         cleanupExpiredDanmakus()
     }
 
-    private func selectBestTrack(for textWidth: CGFloat) -> Int {
-        let currentTime = CGFloat(CACurrentMediaTime())
+    /// 基于轨道结束时间的最优轨道选择
+    private func selectOptimalTrack(currentTime: CGFloat) -> Int {
+        // 确保轨道数组大小正确
+        while trackEndTimes.count < trackCount {
+            trackEndTimes.append(0)
+        }
 
-        // 寻找最早可用的轨道
         var bestTrack = 0
-        var earliestAvailableTime = trackOccupiedUntil[0]
+        var earliestEndTime = trackEndTimes[0]
 
-        for i in 1 ..< trackCount {
-            if trackOccupiedUntil[i] < earliestAvailableTime {
+        print("🎯 轨道选择:")
+        for i in 0 ..< trackCount {
+            let endTime = trackEndTimes[i]
+            let waitTime = max(0, endTime - currentTime)
+
+            print("   轨道 \(i): 结束时间=\(String(format: "%.2f", endTime)), 等待=\(String(format: "%.2f", waitTime))秒")
+
+            if endTime < earliestEndTime {
+                earliestEndTime = endTime
                 bestTrack = i
-                earliestAvailableTime = trackOccupiedUntil[i]
             }
         }
+
+        let selectedWaitTime = max(0, earliestEndTime - currentTime)
+        print("   选择轨道 \(bestTrack), 等待时间: \(String(format: "%.2f", selectedWaitTime))秒")
 
         return bestTrack
     }

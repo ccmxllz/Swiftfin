@@ -30,6 +30,7 @@ struct DanmakuView: UIViewRepresentable {
         var renderer: DanmakuRenderer?
         var lastUpdateTime: Double = 0
         var cancellable: AnyCancellable?
+        var processedDanmakuIds: Set<Int> = []
 
         init(parent: DanmakuView) {
             self.parent = parent
@@ -49,14 +50,38 @@ struct DanmakuView: UIViewRepresentable {
         }
 
         func processDanmakus(_ danmakus: [DanmakuItem]) {
-            guard parent.viewModel.isEnabled, !danmakus.isEmpty else { return }
-            renderer?.addDanmakuItems(danmakus)
+            guard parent.viewModel.isEnabled, !danmakus.isEmpty else {
+                // 如果弹幕被禁用，清除已处理的ID记录
+                if !parent.viewModel.isEnabled {
+                    processedDanmakuIds.removeAll()
+                }
+                return
+            }
+
+            // 只处理新的弹幕
+            let newDanmakus = danmakus.filter { !processedDanmakuIds.contains($0.id) }
+
+            if !newDanmakus.isEmpty {
+                print("🎬 处理 \(newDanmakus.count) 条新弹幕")
+                renderer?.addDanmakuItems(newDanmakus)
+
+                // 记录已处理的弹幕ID
+                newDanmakus.forEach { processedDanmakuIds.insert($0.id) }
+
+                // 限制记录的ID数量，避免内存泄漏
+                if processedDanmakuIds.count > 1000 {
+                    // 保留最近的500个ID
+                    let recentIds = Array(processedDanmakuIds.suffix(500))
+                    processedDanmakuIds = Set(recentIds)
+                }
+            }
         }
 
         func updateSettings() {
             renderer?.setOpacity(CGFloat(parent.viewModel.opacity))
             renderer?.setSpeedMultiplier(CGFloat(parent.viewModel.speed))
             renderer?.setEnabled(parent.viewModel.isEnabled)
+            renderer?.updateSettings() // 更新显示区域等设置
         }
 
         func updateTime(_ currentTime: Double) {

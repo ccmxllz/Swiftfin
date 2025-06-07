@@ -224,6 +224,26 @@ extension Defaults.Keys {
             static let trailingTimestampType: Key<TrailingTimestampType> = UserKey("trailingTimestamp", default: .timeLeft)
             static let showCurrentTimeWhileScrubbing: Key<Bool> = UserKey("showCurrentTimeWhileScrubbing", default: true)
             static let timestampType: Key<TimestampType> = UserKey("timestampType", default: .split)
+
+            // Danmaku
+            static let danmakuEnabled: Key<Bool> = UserKey("danmakuEnabled", default: true)
+            static let danmakuOpacity: Key<Double> = UserKey("danmakuOpacity", default: 0.8)
+            static let danmakuFontSize: Key<Double> = UserKey("danmakuFontSize", default: 16.0)
+            static let danmakuSpeed: Key<Double> = UserKey("danmakuSpeed", default: 1.0)
+            static let danmakuMaxDisplayCount: Key<Int> = UserKey("danmakuMaxDisplayCount", default: 20)
+            static let danmakuShowTopComments: Key<Bool> = UserKey("danmakuShowTopComments", default: true)
+            static let danmakuShowBottomComments: Key<Bool> = UserKey("danmakuShowBottomComments", default: true)
+            static let danmakuShowScrollComments: Key<Bool> = UserKey("danmakuShowScrollComments", default: true)
+            static let danmakuTrackCount: Key<Int> = UserKey("danmakuTrackCount", default: 4)
+            static let danmakuEnhancedShadow: Key<Bool> = UserKey("danmakuEnhancedShadow", default: false)
+            static let danmakuDisplayArea: Key<Double> = UserKey("danmakuDisplayArea", default: 0.5) // 显示区域比例 (0.1-1.0)
+            static let danmakuAreaPosition: Key<String> = UserKey("danmakuAreaPosition", default: "top") // "top", "bottom", "full"
+            static let danmakuAPIBaseURL: Key<String> = UserKey("danmakuAPIBaseURL", default: "")
+            static let danmakuPreferredSource: Key<String> = UserKey("danmakuPreferredSource", default: "jellyfin")
+            static let danmakuPlatform: Key<String> = UserKey(
+                "danmakuPlatform",
+                default: "tencent"
+            ) // "tencent", "bilibili", "youku", "iqiyi"
         }
 
         enum Playback {

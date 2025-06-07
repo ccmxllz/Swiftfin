@@ -143,6 +143,10 @@ struct VideoPlayer: View {
                             }
                         }
 
+                    // 弹幕覆盖层
+                    VideoPlayer.DanmakuOverlay(videoPlayerManager: videoPlayerManager)
+                        .allowsHitTesting(false)
+
                     GestureView()
                         .onHorizontalPan {
                             handlePan(action: horizontalPanGesture, state: $0, point: $1.x, velocity: $2, translation: $3)

@@ -90,6 +90,13 @@ extension VideoPlayer.Overlay {
         }
 
         @ViewBuilder
+        private var danmakuButton: some View {
+            DanmakuActionButton()
+                .frame(width: 45, height: 45)
+                .contentShape(Rectangle())
+        }
+
+        @ViewBuilder
         private var playbackSpeedMenu: some View {
             ActionButtons.PlaybackSpeedMenu {
                 Image(systemName: "speedometer")
@@ -149,6 +156,8 @@ extension VideoPlayer.Overlay {
                         autoPlayButton
                     case .chapters:
                         chaptersButton
+                    case .danmaku:
+                        danmakuButton
                     case .playbackSpeed:
                         playbackSpeedMenu
                     case .playNextItem:

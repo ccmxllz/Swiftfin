@@ -399,6 +399,22 @@
 		5E5237002D4C1C2400D80C2C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5E5236902D4C1C2400D80C2C /* Localizable.strings */; };
 		5E5237012D4C1C2400D80C2C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5E5236AE2D4C1C2400D80C2C /* Localizable.strings */; };
 		5F020AD5E4D4ADE8D0AA46DA /* AttributeBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65CB977628965AA9099742F /* AttributeBadge.swift */; };
+		5F1DF61E2DF32FC200DBFC90 /* DanmakuSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF61D2DF32FC200DBFC90 /* DanmakuSection.swift */; };
+		5F1DF61F2DF32FC200DBFC90 /* DanmakuSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF61D2DF32FC200DBFC90 /* DanmakuSection.swift */; };
+		5F1DF6212DF3311100DBFC90 /* DanmakuOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6202DF3311100DBFC90 /* DanmakuOverlay.swift */; };
+		5F1DF62D2DF3361500DBFC90 /* DanmakuRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF62B2DF3361400DBFC90 /* DanmakuRenderer.swift */; };
+		5F1DF62E2DF3361500DBFC90 /* DanmakuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF62C2DF3361400DBFC90 /* DanmakuView.swift */; };
+		5F1DF62F2DF3361500DBFC90 /* DanmakuRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF62B2DF3361400DBFC90 /* DanmakuRenderer.swift */; };
+		5F1DF6302DF3361500DBFC90 /* DanmakuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF62C2DF3361400DBFC90 /* DanmakuView.swift */; };
+		5F1DF6332DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */; };
+		5F1DF6342DF336E100DBFC90 /* DanmakuComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */; };
+		5F1DF6352DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */; };
+		5F1DF6362DF336E100DBFC90 /* DanmakuComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */; };
+		5F1DF6382DF3371400DBFC90 /* DanmakuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */; };
+		5F1DF6392DF3371400DBFC90 /* DanmakuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */; };
+		5F1DF63B2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */; };
+		5F1DF63C2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */; };
+		5F1DF63E2DF337B000DBFC90 /* DanmakuActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */; };
 		62133890265F83A900A81A2A /* MediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6213388F265F83A900A81A2A /* MediaView.swift */; };
 		621338932660107500A81A2A /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 621338922660107500A81A2A /* String.swift */; };
 		6220D0AD26D5EABB00B8E046 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6220D0AC26D5EABB00B8E046 /* ViewExtensions.swift */; };
@@ -1589,6 +1605,15 @@
 		5E5236BF2D4C1C2400D80C2C /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = Localizable.strings; sourceTree = "<group>"; };
 		5E5236C22D4C1C2400D80C2C /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = Localizable.strings; sourceTree = "<group>"; };
 		5E5236C52D4C1C2400D80C2C /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = Localizable.strings; sourceTree = "<group>"; };
+		5F1DF61D2DF32FC200DBFC90 /* DanmakuSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuSection.swift; sourceTree = "<group>"; };
+		5F1DF6202DF3311100DBFC90 /* DanmakuOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuOverlay.swift; sourceTree = "<group>"; };
+		5F1DF62B2DF3361400DBFC90 /* DanmakuRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuRenderer.swift; sourceTree = "<group>"; };
+		5F1DF62C2DF3361400DBFC90 /* DanmakuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuView.swift; sourceTree = "<group>"; };
+		5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuComment.swift; sourceTree = "<group>"; };
+		5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuConfiguration.swift; sourceTree = "<group>"; };
+		5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuService.swift; sourceTree = "<group>"; };
+		5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuViewModel.swift; sourceTree = "<group>"; };
+		5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuActionButton.swift; sourceTree = "<group>"; };
 		6213388F265F83A900A81A2A /* MediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaView.swift; sourceTree = "<group>"; };
 		621338922660107500A81A2A /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		6220D0AC26D5EABB00B8E046 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
@@ -3271,6 +3296,7 @@
 		532175392671BCED005491E6 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */,
 				4E14DC052CD43F5E001B621B /* AdminDashboard */,
 				E10231462BCF8A6D009D71FC /* ChannelLibraryViewModel.swift */,
 				625CB5762678C34300530A6E /* ConnectToServerViewModel.swift */,
@@ -3412,6 +3438,8 @@
 		535870AB2669D8D300D05A09 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */,
+				5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */,
 				E1D4BF802719D22800A11E64 /* AppAppearance.swift */,
 				E1CB75742C80EAFA00217C76 /* ArrayBuilder.swift */,
 				E11562942C818CB2001D5DE4 /* BindingBox.swift */,
@@ -4090,6 +4118,7 @@
 		BD39577A2C113F780078CEF8 /* Sections */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF61D2DF32FC200DBFC90 /* DanmakuSection.swift */,
 				BD3957742C112A330078CEF8 /* ButtonSection.swift */,
 				BD3957762C112AD30078CEF8 /* SliderSection.swift */,
 				BD3957782C113EC40078CEF8 /* SubtitleSection.swift */,
@@ -4368,6 +4397,7 @@
 		E11245B228D97D4A00D8A977 /* Overlays */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF6202DF3311100DBFC90 /* DanmakuOverlay.swift */,
 				E11245B528D97EC200D8A977 /* Components */,
 				E139CC1C28EC836F00688DE2 /* ChapterOverlay.swift */,
 				E1559A75294D960C00C1FFBC /* MainOverlay.swift */,
@@ -4678,6 +4708,7 @@
 		E1549654296CA2EF00C4EF88 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */,
 				E154965B296CA2EF00C4EF88 /* DownloadManager.swift */,
 				E1549655296CA2EF00C4EF88 /* DownloadTask.swift */,
 				E19D41A92BF077130082B8B2 /* Keychain.swift */,
@@ -5060,6 +5091,8 @@
 		E1AD105326D96F5A003E4A08 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF62B2DF3361400DBFC90 /* DanmakuRenderer.swift */,
+				5F1DF62C2DF3361400DBFC90 /* DanmakuView.swift */,
 				E102314C2BCF8A7E009D71FC /* AlternateLayoutView.swift */,
 				E104DC952B9E7E29008F506D /* AssertionFailureView.swift */,
 				B65CB977628965AA9099742F /* AttributeBadge.swift */,
@@ -5124,6 +5157,7 @@
 		E1BDF2ED2952296000CC0294 /* ActionButtons */ = {
 			isa = PBXGroup;
 			children = (
+				5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */,
 				E1E6C43E29AECC5A0064123F /* ActionButtons.swift */,
 				E1BDF31629525F0400CC0294 /* AdvancedActionButton.swift */,
 				E1BDF2EB2952290200CC0294 /* AspectFillActionButton.swift */,
@@ -5895,6 +5929,8 @@
 				E1B490452967E26300D3EDCE /* PersistentLogHandler.swift in Sources */,
 				E193D53327193F7D00900D82 /* FilterCoordinator.swift in Sources */,
 				E18E021E2887492B0022598C /* RowDivider.swift in Sources */,
+				5F1DF6352DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */,
+				5F1DF6362DF336E100DBFC90 /* DanmakuComment.swift in Sources */,
 				4E49DED62CE54D9D00352DCD /* LoginFailurePolicy.swift in Sources */,
 				E1DC983E296DEB9B00982F06 /* UnwatchedIndicator.swift in Sources */,
 				4E2AC4BF2C6C48D200DD600D /* CustomDeviceProfileAction.swift in Sources */,
@@ -6049,6 +6085,8 @@
 				4E9654482D99C553006CB024 /* CollectionType.swift in Sources */,
 				E178859B2780F1F40094FBCF /* tvOSSlider.swift in Sources */,
 				E103DF952BCF31CD000229B2 /* MediaItem.swift in Sources */,
+				5F1DF62F2DF3361500DBFC90 /* DanmakuRenderer.swift in Sources */,
+				5F1DF6302DF3361500DBFC90 /* DanmakuView.swift in Sources */,
 				E1ED91192B95993300802036 /* TitledLibraryParent.swift in Sources */,
 				62E632E1267D30CA0063E547 /* ItemLibraryViewModel.swift in Sources */,
 				4ECF5D8B2D0A57EF00F066B1 /* DynamicDayOfWeek.swift in Sources */,
@@ -6130,6 +6168,7 @@
 				E154677A289AF48200087E35 /* CollectionItemContentView.swift in Sources */,
 				E1DABAFC2A270EE7008AC34A /* MediaSourcesCard.swift in Sources */,
 				E193D53D27193F9700900D82 /* UserSignInCoordinator.swift in Sources */,
+				5F1DF6382DF3371400DBFC90 /* DanmakuService.swift in Sources */,
 				E14EDEC62B8FB64E000F00A4 /* AnyItemFilter.swift in Sources */,
 				E14EDEC92B8FB65F000F00A4 /* ItemFilterType.swift in Sources */,
 				E1D37F4C2B9CEA5C00343D2B /* ImageSource.swift in Sources */,
@@ -6139,9 +6178,11 @@
 				4EAE340C2D42B857006FBAD3 /* LibrarySection.swift in Sources */,
 				E118959E289312020042947B /* BaseItemPerson+Poster.swift in Sources */,
 				4E4DAC3D2D11F94400E13FF9 /* LocalServerButton.swift in Sources */,
+				5F1DF63C2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */,
 				62E632DD267D2E130063E547 /* SearchViewModel.swift in Sources */,
 				BD0BA22C2AD6503B00306A8D /* OnlineVideoPlayerManager.swift in Sources */,
 				E1575EA2293E7B1E001665B1 /* Color.swift in Sources */,
+				5F1DF61F2DF32FC200DBFC90 /* DanmakuSection.swift in Sources */,
 				E12E30F5296392EC0022FAC9 /* EnumPickerView.swift in Sources */,
 				E1575E72293E77B5001665B1 /* Utilities.swift in Sources */,
 				E164A7F72BE4816500A54B18 /* SelectUserServerSelection.swift in Sources */,
@@ -6378,6 +6419,7 @@
 				E148128828C154BF003B8787 /* ItemFilter+ItemTrait.swift in Sources */,
 				4EB1404C2C8E45B1008691F3 /* StreamSection.swift in Sources */,
 				4E49DEE42CE55FB900352DCD /* SyncPlayUserAccessType.swift in Sources */,
+				5F1DF61E2DF32FC200DBFC90 /* DanmakuSection.swift in Sources */,
 				E1A3E4D12BB7F5BF005C59F8 /* ErrorCard.swift in Sources */,
 				4E49DECB2CE54AA200352DCD /* SessionsSection.swift in Sources */,
 				E1AEFA372BE317E200CFAFD8 /* ListRowButton.swift in Sources */,
@@ -6421,6 +6463,8 @@
 				4E2AC4BE2C6C48D200DD600D /* CustomDeviceProfileAction.swift in Sources */,
 				E18E01FA288747580022598C /* AboutAppView.swift in Sources */,
 				E170D103294CE8BF0017224C /* LoadingView.swift in Sources */,
+				5F1DF6332DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */,
+				5F1DF6342DF336E100DBFC90 /* DanmakuComment.swift in Sources */,
 				6220D0AD26D5EABB00B8E046 /* ViewExtensions.swift in Sources */,
 				E15D63ED2BD622A700AA665D /* CompactChannelView.swift in Sources */,
 				E18A8E8528D60D0000333B9A /* VideoPlayerCoordinator.swift in Sources */,
@@ -6434,6 +6478,7 @@
 				4E661A142CEFE46300025C99 /* DisplayOrderSection.swift in Sources */,
 				4E2CE39B2DA479BC0004736A /* ServerActivityDetailViewModel.swift in Sources */,
 				4E661A152CEFE46300025C99 /* LocalizationSection.swift in Sources */,
+				5F1DF6212DF3311100DBFC90 /* DanmakuOverlay.swift in Sources */,
 				4E661A162CEFE46300025C99 /* ParentialRatingsSection.swift in Sources */,
 				4E661A172CEFE46300025C99 /* OverviewSection.swift in Sources */,
 				4E661A182CEFE46300025C99 /* ReviewsSection.swift in Sources */,
@@ -6484,6 +6529,7 @@
 				4EFAC1382D1FB26600E40880 /* TagInput.swift in Sources */,
 				E102314D2BCF8A7E009D71FC /* AlternateLayoutView.swift in Sources */,
 				E12CC1BB28D11E1000678D5D /* RecentlyAddedViewModel.swift in Sources */,
+				5F1DF63E2DF337B000DBFC90 /* DanmakuActionButton.swift in Sources */,
 				E1BE1CEE2BDB68CD008176A9 /* UserProfileRow.swift in Sources */,
 				E17FB55228C119D400311DFE /* Displayable.swift in Sources */,
 				E113132B28BDB4B500930F75 /* NavigationBarDrawerView.swift in Sources */,
@@ -6579,6 +6625,7 @@
 				4E90F7662CC72B1F00417C31 /* LastErrorSection.swift in Sources */,
 				4E90F7672CC72B1F00417C31 /* TriggerRow.swift in Sources */,
 				4E90F7682CC72B1F00417C31 /* TriggersSection.swift in Sources */,
+				5F1DF63B2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */,
 				4E90F76A2CC72B1F00417C31 /* DetailsSection.swift in Sources */,
 				E129428828F0831F00796AC6 /* SplitTimestamp.swift in Sources */,
 				C46DD8E72A8FA77F0046A504 /* LiveBottomBarView.swift in Sources */,
@@ -6757,6 +6804,7 @@
 				E113133A28BEB71D00930F75 /* FilterViewModel.swift in Sources */,
 				E1E6C44C29AED2BE0064123F /* HorizontalAlignment.swift in Sources */,
 				E1A1528D28FD23AC00600579 /* VideoPlayerSettingsCoordinator.swift in Sources */,
+				5F1DF6392DF3371400DBFC90 /* DanmakuService.swift in Sources */,
 				4E35CE642CBED69600DBD886 /* TaskTriggerType.swift in Sources */,
 				E18E01EE288747230022598C /* AboutView.swift in Sources */,
 				4EB132EF2D2CF6D600B5A8E5 /* ImageType.swift in Sources */,
@@ -6848,6 +6896,8 @@
 				4EFE0C802D02055900D4834D /* ItemArrayElements.swift in Sources */,
 				C46DD8DD2A8DC3420046A504 /* LiveNativeVideoPlayer.swift in Sources */,
 				E1AD104D26D96CE3003E4A08 /* BaseItemDto.swift in Sources */,
+				5F1DF62D2DF3361500DBFC90 /* DanmakuRenderer.swift in Sources */,
+				5F1DF62E2DF3361500DBFC90 /* DanmakuView.swift in Sources */,
 				E13DD3BF27163DD7009D4DAF /* AppDelegate.swift in Sources */,
 				4EB1A8CA2C9A766200F43898 /* ActiveSessionsView.swift in Sources */,
 				4E2CE38A2DA426720004736A /* ActivityLogEntry.swift in Sources */,
@@ -7509,7 +7559,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 78;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8J2HYANDM5;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -7525,7 +7575,7 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = org.jellyfin.swiftfin;
+				PRODUCT_BUNDLE_IDENTIFIER = org.jellyfin.swiftfin.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
@@ -7549,7 +7599,7 @@
 				CURRENT_PROJECT_VERSION = 78;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8J2HYANDM5;
 				ENABLE_BITCODE = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -7565,7 +7615,7 @@
 				);
 				MARKETING_VERSION = 1.0.0;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = org.jellyfin.swiftfin;
+				PRODUCT_BUNDLE_IDENTIFIER = org.jellyfin.swiftfin.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
