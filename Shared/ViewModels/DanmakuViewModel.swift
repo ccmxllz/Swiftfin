@@ -26,6 +26,8 @@ final class DanmakuViewModel: ViewModel, Stateful {
         case loadSegment(Int, Int)
         case clearDanmakus
         case reloadDanmakus
+        case pauseDanmaku
+        case resumeDanmaku
         case error(JellyfinAPIError)
 
         static func == (lhs: Action, rhs: Action) -> Bool {
@@ -43,6 +45,10 @@ final class DanmakuViewModel: ViewModel, Stateful {
             case (.clearDanmakus, .clearDanmakus):
                 return true
             case (.reloadDanmakus, .reloadDanmakus):
+                return true
+            case (.pauseDanmaku, .pauseDanmaku):
+                return true
+            case (.resumeDanmaku, .resumeDanmaku):
                 return true
             case let (.error(lhsError), .error(rhsError)):
                 return lhsError.localizedDescription == rhsError.localizedDescription
@@ -80,6 +86,9 @@ final class DanmakuViewModel: ViewModel, Stateful {
 
     @Published
     var state: State = .initial
+
+    @Published
+    var isPaused: Bool = false
 
     // MARK: - Private Properties
 
@@ -228,6 +237,16 @@ final class DanmakuViewModel: ViewModel, Stateful {
             print("🔄 弹幕数据已清除，将重新加载")
             return state
 
+        case .pauseDanmaku:
+            isPaused = true
+            print("⏸️ 弹幕已暂停")
+            return state
+
+        case .resumeDanmaku:
+            isPaused = false
+            print("▶️ 弹幕已恢复")
+            return state
+
         case let .error(error):
             return .error(error)
         }
@@ -251,8 +270,11 @@ final class DanmakuViewModel: ViewModel, Stateful {
     }
 
     private func updateDanmakus(at currentTime: Double) {
-        guard isEnabled else {
-            if !currentDanmakus.isEmpty {
+        guard isEnabled && !isPaused else {
+            if !currentDanmakus.isEmpty && isPaused {
+                // 暂停时清空当前弹幕，但不清空已加载的弹幕数据
+                currentDanmakus = []
+            } else if !isEnabled && !currentDanmakus.isEmpty {
                 currentDanmakus = []
             }
             return

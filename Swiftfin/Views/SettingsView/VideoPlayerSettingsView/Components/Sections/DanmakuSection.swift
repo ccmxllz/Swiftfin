@@ -40,6 +40,8 @@ extension VideoPlayerSettingsView {
         private var preferredSource
         @Default(.VideoPlayer.Overlay.danmakuEnhancedShadow)
         private var enhancedShadow
+        @Default(.VideoPlayer.Overlay.danmakuSmoothMode)
+        private var smoothMode
 
         var body: some View {
             Section {
@@ -67,6 +69,8 @@ extension VideoPlayerSettingsView {
                     }
 
                     Toggle("增强字体效果", isOn: $enhancedShadow)
+
+                    Toggle("柔和显示模式", isOn: $smoothMode)
 
                     BasicStepper(
                         title: "滚动速度",
@@ -121,7 +125,7 @@ extension VideoPlayerSettingsView {
             } header: {
                 Text("弹幕设置")
             } footer: {
-                Text("弹幕功能可以在视频播放时显示观众评论。增强字体效果可提供更粗的描边和阴影，类似腾讯视频的弹幕样式。")
+                Text("弹幕功能可以在视频播放时显示观众评论。柔和显示模式可减少眼部疲劳，提供更舒适的观看体验。")
             }
 
             // 服务器配置部分

@@ -7,6 +7,7 @@
 //
 
 import DanmakuKit
+import Defaults
 import Foundation
 import UIKit
 
@@ -118,6 +119,13 @@ class DanmakuTextCell: DanmakuCell {
 
         let text = NSString(string: model.text)
 
+        // 启用抗锯齿和平滑渲染，减少锐利感
+        context.setAllowsAntialiasing(true)
+        context.setShouldAntialias(true)
+        context.setAllowsFontSmoothing(true)
+        context.setShouldSmoothFonts(true)
+        context.interpolationQuality = .high
+
         // 设置阴影
         context.setShadow(
             offset: model.shadowOffset,
@@ -131,38 +139,19 @@ class DanmakuTextCell: DanmakuCell {
         context.setLineCap(.round)
         context.setStrokeColor(model.strokeColor.cgColor)
 
-        // 绘制多层描边以增强效果（类似腾讯视频）
-        context.saveGState()
-        context.setTextDrawingMode(.stroke)
+        // 根据柔和模式设置渲染参数
+        let smoothMode = Defaults[.VideoPlayer.Overlay.danmakuSmoothMode]
 
-        // 外层描边（更粗）
-        let outerStrokeAttributes: [NSAttributedString.Key: Any] = [
+        let attributes: [NSAttributedString.Key: Any] = [
             .font: model.font,
-            .foregroundColor: model.strokeColor,
-            .strokeWidth: model.strokeWidth * 2.0,
-            .strokeColor: model.strokeColor,
+            .foregroundColor: model.textColor.withAlphaComponent(smoothMode ? 0.9 : 0.95),
+            .strokeColor: model.strokeColor.withAlphaComponent(smoothMode ? 0.6 : 0.7),
+            .strokeWidth: -(model.strokeWidth * (smoothMode ? 0.6 : 0.8)), // 柔和模式使用更细的描边
         ]
-        text.draw(at: .zero, withAttributes: outerStrokeAttributes)
 
-        // 内层描边
-        let innerStrokeAttributes: [NSAttributedString.Key: Any] = [
-            .font: model.font,
-            .foregroundColor: model.strokeColor,
-            .strokeWidth: model.strokeWidth,
-            .strokeColor: model.strokeColor,
-        ]
-        text.draw(at: .zero, withAttributes: innerStrokeAttributes)
-
-        context.restoreGState()
-
-        // 绘制填充文字
-        context.setShadow(offset: CGSize.zero, blur: 0, color: nil) // 清除阴影
-        context.setTextDrawingMode(.fill)
-        let fillAttributes: [NSAttributedString.Key: Any] = [
-            .font: model.font,
-            .foregroundColor: model.textColor,
-        ]
-        text.draw(at: .zero, withAttributes: fillAttributes)
+        // 清除阴影后绘制文字
+        context.setShadow(offset: CGSize.zero, blur: 0, color: nil)
+        text.draw(at: .zero, withAttributes: attributes)
     }
 
     override func didDisplay(_ finished: Bool) {

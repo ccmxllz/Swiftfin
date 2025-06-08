@@ -47,11 +47,19 @@ extension VideoPlayer {
                 }
             }
             .onReceive(videoPlayerManager.$state) { state in
-                // 当播放器状态变化时，可以进行相应处理
+                // 当播放器状态变化时，同步弹幕状态
                 switch state {
                 case .stopped, .error:
                     Task {
                         await danmakuViewModel.send(.clearDanmakus)
+                    }
+                case .paused:
+                    Task {
+                        await danmakuViewModel.send(.pauseDanmaku)
+                    }
+                case .playing:
+                    Task {
+                        await danmakuViewModel.send(.resumeDanmaku)
                     }
                 default:
                     break

@@ -236,6 +236,7 @@ extension Defaults.Keys {
             static let danmakuShowScrollComments: Key<Bool> = UserKey("danmakuShowScrollComments", default: true)
             static let danmakuTrackCount: Key<Int> = UserKey("danmakuTrackCount", default: 4)
             static let danmakuEnhancedShadow: Key<Bool> = UserKey("danmakuEnhancedShadow", default: false)
+            static let danmakuSmoothMode: Key<Bool> = UserKey("danmakuSmoothMode", default: true)
             static let danmakuDisplayArea: Key<Double> = UserKey("danmakuDisplayArea", default: 0.5) // 显示区域比例 (0.1-1.0)
             static let danmakuAreaPosition: Key<String> = UserKey("danmakuAreaPosition", default: "top") // "top", "bottom", "full"
             static let danmakuAPIBaseURL: Key<String> = UserKey("danmakuAPIBaseURL", default: "")

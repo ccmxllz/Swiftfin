@@ -36,9 +36,9 @@ struct DanmakuView: UIViewRepresentable {
             self.parent = parent
             super.init()
 
-            // 订阅弹幕数据变化
+            // 订阅弹幕数据变化，降低刷新频率减少眼部疲劳
             cancellable = parent.viewModel.$currentDanmakus
-                .throttle(for: .milliseconds(100), scheduler: DispatchQueue.global(), latest: true)
+                .throttle(for: .milliseconds(300), scheduler: DispatchQueue.global(), latest: true)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] danmakus in
                     self?.processDanmakus(danmakus)
@@ -82,10 +82,19 @@ struct DanmakuView: UIViewRepresentable {
             renderer?.setSpeedMultiplier(CGFloat(parent.viewModel.speed))
             renderer?.setEnabled(parent.viewModel.isEnabled)
             renderer?.updateSettings() // 更新显示区域等设置
+
+            // 处理暂停/恢复状态
+            if parent.viewModel.isPaused {
+                renderer?.stopAnimation()
+            } else if parent.viewModel.isEnabled {
+                // 只有在启用弹幕且不暂停时才恢复动画
+                renderer?.setEnabled(true)
+            }
         }
 
         func updateTime(_ currentTime: Double) {
-            if abs(currentTime - lastUpdateTime) > 0.2 {
+            // 降低时间更新频率，减少不必要的重绘
+            if abs(currentTime - lastUpdateTime) > 0.5 {
                 lastUpdateTime = currentTime
                 Task {
                     await parent.viewModel.send(.updateCurrentTime(currentTime))

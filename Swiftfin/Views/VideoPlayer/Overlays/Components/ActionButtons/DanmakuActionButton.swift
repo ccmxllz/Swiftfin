@@ -67,7 +67,7 @@ struct DanmakuActionButton: View {
         } label: {
             Image(systemName: isDanmakuEnabled ? "bubble.left.fill" : "bubble.left")
                 .font(.title2)
-                .foregroundColor(isDanmakuEnabled ? .jellyfinPurple : .white)
+                .foregroundColor(.white)
         }
         .buttonStyle(PlainButtonStyle())
         .help(isDanmakuEnabled ? "弹幕设置" : "启用弹幕")
