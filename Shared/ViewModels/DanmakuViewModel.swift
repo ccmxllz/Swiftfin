@@ -151,7 +151,7 @@ final class DanmakuViewModel: ViewModel, Stateful {
         // 监听弹幕平台变化
         Defaults.publisher(.VideoPlayer.Overlay.danmakuPlatform)
             .sink { [weak self] change in
-                print("🔄 弹幕平台切换: \(change.oldValue) -> \(change.newValue)")
+                self?.logger.info("Danmaku platform changed: \(change.oldValue) -> \(change.newValue)")
                 Task {
                     await self?.send(.reloadDanmakus)
                 }
@@ -165,7 +165,7 @@ final class DanmakuViewModel: ViewModel, Stateful {
     func respond(to action: Action) -> State {
         switch action {
         case let .setEnabled(enabled):
-            print("💬 弹幕启用状态变更: \(enabled)")
+            logger.debug("Danmaku enabled state changed: \(enabled)")
             if !enabled {
                 currentDanmakus = []
             }
@@ -177,11 +177,11 @@ final class DanmakuViewModel: ViewModel, Stateful {
             // 提取媒体关键词
             mediaKeyword = extractMediaKeyword(from: item)
 
-            print("🎯 媒体关键词: '\(mediaKeyword)'")
-            print("📋 系列参数: \(String(describing: seriesParams))")
+            logger.info("Danmaku media keyword: '\(mediaKeyword)'")
+            logger.debug("Series parameters: \(String(describing: seriesParams))")
 
             if mediaKeyword.isEmpty {
-                print("❌ 媒体关键词为空")
+                logger.warning("Media keyword is empty")
                 return .error(.init("无效的媒体标题"))
             }
 
@@ -190,18 +190,18 @@ final class DanmakuViewModel: ViewModel, Stateful {
             currentDanmakus.removeAll()
             loadedTimeSegments.removeAll()
 
-            print("✅ 弹幕系统准备就绪")
+            logger.info("Danmaku system ready")
             return .ready
 
         case let .setMediaWithKeyword(keyword, seriesParams):
             self.seriesParams = seriesParams
             self.mediaKeyword = keyword
 
-            print("🎯 媒体关键词: '\(mediaKeyword)'")
-            print("📋 系列参数: \(String(describing: seriesParams))")
+            logger.info("Danmaku media keyword: '\(mediaKeyword)'")
+            logger.debug("Series parameters: \(String(describing: seriesParams))")
 
             if mediaKeyword.isEmpty {
-                print("❌ 媒体关键词为空")
+                logger.warning("Media keyword is empty")
                 return .error(.init("无效的媒体标题"))
             }
 
@@ -210,11 +210,11 @@ final class DanmakuViewModel: ViewModel, Stateful {
             currentDanmakus.removeAll()
             loadedTimeSegments.removeAll()
 
-            print("✅ 弹幕系统准备就绪")
+            logger.info("Danmaku system ready")
             return .ready
 
         case let .updateCurrentTime(currentTime):
-            print("⏰ 更新播放时间: \(currentTime)秒, 弹幕启用: \(isEnabled)")
+            logger.trace("Update playback time: \(currentTime)s, danmaku enabled: \(isEnabled)")
             updateDanmakus(at: currentTime)
             return state
 
@@ -234,17 +234,17 @@ final class DanmakuViewModel: ViewModel, Stateful {
             currentDanmakus.removeAll()
             loadedTimeSegments.removeAll()
             danmakuCache.removeAll()
-            print("🔄 弹幕数据已清除，将重新加载")
+            logger.info("Danmaku data cleared, will reload")
             return state
 
         case .pauseDanmaku:
             isPaused = true
-            print("⏸️ 弹幕已暂停")
+            logger.debug("Danmaku paused")
             return state
 
         case .resumeDanmaku:
             isPaused = false
-            print("▶️ 弹幕已恢复")
+            logger.debug("Danmaku resumed")
             return state
 
         case let .error(error):
@@ -350,12 +350,12 @@ final class DanmakuViewModel: ViewModel, Stateful {
 
     private func loadDanmakuSegment(startTime: Int, endTime: Int) {
         guard !mediaKeyword.isEmpty else {
-            print("❌ 媒体关键词为空，跳过弹幕加载")
+            logger.warning("Media keyword is empty, skipping danmaku loading")
             return
         }
 
-        print("🔄 开始加载弹幕段: \(startTime)-\(endTime)秒")
-        print("🎯 关键词: '\(mediaKeyword)', 平台: \(danmakuPlatform)")
+        logger.debug("Loading danmaku segment: \(startTime)-\(endTime)s")
+        logger.trace("Keyword: '\(mediaKeyword)', platform: \(danmakuPlatform)")
 
         backgroundStates.insert(.loading)
 
@@ -372,12 +372,12 @@ final class DanmakuViewModel: ViewModel, Stateful {
                 await MainActor.run {
                     self.danmakus.append(contentsOf: items)
                     self.backgroundStates.remove(.loading)
-                    print("✅ 成功加载弹幕段 \(startTime)-\(endTime): \(items.count)条弹幕")
+                    self.logger.info("Successfully loaded danmaku segment \(startTime)-\(endTime): \(items.count) items")
                 }
             } catch {
                 await MainActor.run {
                     self.backgroundStates.remove(.loading)
-                    print("❌ 弹幕加载失败: \(error.localizedDescription)")
+                    self.logger.error("Failed to load danmaku: \(error.localizedDescription)")
                 }
             }
         }

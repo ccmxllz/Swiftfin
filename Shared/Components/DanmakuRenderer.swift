@@ -8,7 +8,9 @@
 
 import DanmakuKit
 import Defaults
+import Factory
 import Foundation
+import Logging
 import UIKit
 
 // 避免与项目中的 DanmakuView 冲突
@@ -19,6 +21,9 @@ typealias DanmakuKitView = DanmakuKit.DanmakuView
 final class DanmakuRenderer: ObservableObject {
 
     // MARK: - Properties
+
+    @Injected(\.logService)
+    private var logger
 
     private weak var containerView: UIView?
     private var danmakuView: DanmakuKitView?
@@ -45,7 +50,7 @@ final class DanmakuRenderer: ObservableObject {
 
         // 确保容器尺寸有效
         if containerSize.width <= 0 || containerSize.height <= 0 {
-            print("⚠️ 容器视图尺寸无效: \(containerSize)，使用默认尺寸")
+            logger.warning("Invalid container view size: \(containerSize), using default size")
             self.containerSize = CGSize(width: 375, height: 667) // 默认iPhone尺寸
         }
 
@@ -97,10 +102,7 @@ final class DanmakuRenderer: ObservableObject {
 
         updateDanmakuViewFrame()
 
-        print("🎯 DanmakuKit 设置更新:")
-        print("   轨道数: \(trackCount)")
-        print("   显示比例: \(displayAreaRatio)")
-        print("   显示位置: \(displayAreaPosition)")
+        logger.debug("DanmakuKit settings updated: tracks=\(trackCount), ratio=\(displayAreaRatio), position=\(displayAreaPosition)")
     }
 
     func addDanmakuItems(_ items: [DanmakuItem]) {
@@ -117,7 +119,7 @@ final class DanmakuRenderer: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             self?.danmakuView?.stop()
             self?.danmakuView?.play()
-            print("🧹 DanmakuKit 清空所有弹幕")
+            self?.logger.debug("DanmakuKit cleared all danmaku")
         }
     }
 
@@ -137,7 +139,7 @@ final class DanmakuRenderer: ObservableObject {
 
         // 验证参数有效性
         guard frame.width > 0, frame.height > 0, trackHeight > 0 else {
-            print("⚠️ DanmakuKit 参数无效: frame=\(frame), trackHeight=\(trackHeight)")
+            logger.warning("Invalid DanmakuKit parameters: frame=\(frame), trackHeight=\(trackHeight)")
             return
         }
 
@@ -154,7 +156,7 @@ final class DanmakuRenderer: ObservableObject {
         // 开始播放
         danmakuView.play()
 
-        print("🎯 DanmakuKit 视图创建完成: frame=\(frame), trackHeight=\(trackHeight)")
+        logger.info("DanmakuKit view created: frame=\(frame), trackHeight=\(trackHeight)")
     }
 
     private func updateDanmakuViewFrame() {
@@ -163,20 +165,20 @@ final class DanmakuRenderer: ObservableObject {
 
         // 验证参数有效性
         guard frame.width > 0, frame.height > 0, trackHeight > 0 else {
-            print("⚠️ DanmakuKit 更新参数无效: frame=\(frame), trackHeight=\(trackHeight)")
+            logger.warning("Invalid DanmakuKit update parameters: frame=\(frame), trackHeight=\(trackHeight)")
             return
         }
 
         danmakuView?.frame = frame
         danmakuView?.trackHeight = trackHeight
 
-        print("🔄 DanmakuKit 视图更新: frame=\(frame), trackHeight=\(trackHeight)")
+        logger.debug("DanmakuKit view updated: frame=\(frame), trackHeight=\(trackHeight)")
     }
 
     private func calculateDanmakuFrame() -> CGRect {
         // 确保容器尺寸有效
         guard containerSize.width > 0, containerSize.height > 0 else {
-            print("⚠️ 容器尺寸无效: \(containerSize)")
+            logger.warning("Invalid container size: \(containerSize)")
             return CGRect(x: 0, y: 0, width: 100, height: 100) // 返回默认尺寸
         }
 
@@ -203,7 +205,7 @@ final class DanmakuRenderer: ObservableObject {
 
         // 验证计算结果
         if frame.width <= 0 || frame.height <= 0 {
-            print("⚠️ 计算的弹幕区域无效: \(frame)")
+            logger.warning("Invalid calculated danmaku area: \(frame)")
             return CGRect(x: 0, y: 0, width: containerSize.width, height: containerSize.height)
         }
 
@@ -219,7 +221,7 @@ final class DanmakuRenderer: ObservableObject {
 
         // 检查是否为有效数值
         if validTrackHeight.isNaN || validTrackHeight.isInfinite {
-            print("⚠️ 计算轨道高度异常: displayAreaHeight=\(displayAreaHeight), trackCount=\(trackCount)")
+            logger.warning("Invalid track height calculation: displayAreaHeight=\(displayAreaHeight), trackCount=\(trackCount)")
             return 20.0 // 返回默认值
         }
 
@@ -264,6 +266,6 @@ final class DanmakuRenderer: ObservableObject {
         // 发射弹幕
         danmakuView.shoot(danmaku: cellModel)
 
-        print("🎬 DanmakuKit 发射弹幕: '\(item.content)', 类型: \(cellModel.type), 时长: \(cellModel.displayTime)s")
+        logger.trace("DanmakuKit shot danmaku: '\(item.content)', type: \(cellModel.type), duration: \(cellModel.displayTime)s")
     }
 }

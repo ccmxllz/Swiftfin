@@ -7,7 +7,9 @@
 //
 
 import Defaults
+import Factory
 import JellyfinAPI
+import Logging
 import SwiftUI
 
 // MARK: - DanmakuOverlay
@@ -17,6 +19,8 @@ extension VideoPlayer {
 
         // MARK: - Properties
 
+        @Injected(\.logService)
+        private var logger
         @StateObject
         private var danmakuViewModel = DanmakuViewModel()
         @ObservedObject
@@ -36,11 +40,11 @@ extension VideoPlayer {
                 }
             }
             .onReceive(videoPlayerManager.$currentViewModel) { viewModel in
-                print("📱 收到 currentViewModel 变化: \(viewModel?.item.displayTitle ?? "nil")")
+                logger.debug("Current view model changed: \(viewModel?.item.displayTitle ?? "nil")")
                 if let viewModel = viewModel {
                     setupDanmakuForItem(viewModel)
                 } else {
-                    print("🧹 清除弹幕数据")
+                    logger.debug("Clearing danmaku data")
                     Task {
                         await danmakuViewModel.send(.clearDanmakus)
                     }
@@ -72,13 +76,13 @@ extension VideoPlayer {
                 }
             }
             .onAppear {
-                print("🎭 DanmakuOverlay 出现")
+                logger.debug("DanmakuOverlay appeared")
                 // 检查是否已经有当前视频
                 if let currentViewModel = videoPlayerManager.currentViewModel {
-                    print("🎬 发现已有视频: \(currentViewModel.item.displayTitle)")
+                    logger.debug("Found existing video: \(currentViewModel.item.displayTitle)")
                     setupDanmakuForItem(currentViewModel)
                 } else {
-                    print("❌ 当前没有视频")
+                    logger.debug("No current video found")
                 }
             }
         }
@@ -93,13 +97,13 @@ extension VideoPlayer {
             let mediaKeyword: String
             if viewModel.item.type == .episode, let seriesName = viewModel.item.seriesName {
                 mediaKeyword = seriesName
-                print("🎬 设置弹幕媒体 (剧集): \(viewModel.item.displayTitle) -> 系列: \(seriesName)")
+                logger.info("Setting danmaku media (episode): \(viewModel.item.displayTitle) -> series: \(seriesName)")
             } else {
                 mediaKeyword = viewModel.item.displayTitle
-                print("🎬 设置弹幕媒体: \(mediaKeyword)")
+                logger.info("Setting danmaku media: \(mediaKeyword)")
             }
 
-            print("📺 系列参数: \(String(describing: seriesParams))")
+            logger.debug("Series parameters: \(String(describing: seriesParams))")
 
             Task {
                 await danmakuViewModel.send(.setMediaWithKeyword(mediaKeyword, seriesParams))

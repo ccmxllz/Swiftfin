@@ -8,6 +8,8 @@
 
 import Combine
 import Defaults
+import Factory
+import Logging
 import SwiftUI
 
 #if canImport(UIKit)
@@ -26,6 +28,9 @@ struct DanmakuView: UIViewRepresentable {
     // MARK: - Coordinator
 
     class Coordinator: NSObject {
+        @Injected(\.logService)
+        private var logger
+
         var parent: DanmakuView
         var renderer: DanmakuRenderer?
         var lastUpdateTime: Double = 0
@@ -62,7 +67,7 @@ struct DanmakuView: UIViewRepresentable {
             let newDanmakus = danmakus.filter { !processedDanmakuIds.contains($0.id) }
 
             if !newDanmakus.isEmpty {
-                print("🎬 处理 \(newDanmakus.count) 条新弹幕")
+                logger.debug("Processing \(newDanmakus.count) new danmaku items")
                 renderer?.addDanmakuItems(newDanmakus)
 
                 // 记录已处理的弹幕ID
