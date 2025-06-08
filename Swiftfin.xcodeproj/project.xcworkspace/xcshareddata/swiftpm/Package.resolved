@@ -1,5 +1,5 @@
 {
-  "originHash" : "c0629a7b4fc9417c7ea1139dd2042681f19a995b8e14b60795c49bae00dc8f8c",
+  "originHash" : "3ba494baa9e7f3d00f38522f1ff43da320443714b51a11c3ab18c7ed6cdaa525",
   "pins" : [
     {
       "identity" : "blurhashkit",
@@ -42,6 +42,15 @@
       "state" : {
         "revision" : "4b6d9a54e75d2c9fd2c3c768f7d4aa3175c09133",
         "version" : "9.2.0"
+      }
+    },
+    {
+      "identity" : "danmakukit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/qyz777/DanmakuKit.git",
+      "state" : {
+        "revision" : "6e8d367592044f022a2b6ce6ea23450a120bb9c2",
+        "version" : "1.5.2"
       }
     },
     {

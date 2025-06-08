@@ -37,10 +37,12 @@ struct DanmakuFontConfiguration {
     // MARK: - Font Names
 
     private let preferredFontNames: [String] = [
+        "PingFangSC-Semibold", // 苹果默认中文字体（半粗体）
         "PingFangSC-Medium", // 苹果默认中文字体
         "HiraginoSansGB-W6", // 冬青黑体中粗
         "STHeitiSC-Medium", // 华文黑体
         "HiraginoSansGB-W3", // 冬青黑体
+        "HelveticaNeue-Bold", // 英文字体备选（粗体）
         "HelveticaNeue-Medium", // 英文字体备选
     ]
 
@@ -75,11 +77,13 @@ struct DanmakuFontConfiguration {
                 return font
             }
         }
-        return UIFont.systemFont(ofSize: size, weight: .semibold)
+        return UIFont.systemFont(ofSize: size, weight: .bold)
     }
 
-    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
-        if UIFont(name: "PingFangSC-Medium", size: size) != nil {
+    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .bold) -> Font {
+        if UIFont(name: "PingFangSC-Semibold", size: size) != nil {
+            return .custom("PingFangSC-Semibold", size: size)
+        } else if UIFont(name: "PingFangSC-Medium", size: size) != nil {
             return .custom("PingFangSC-Medium", size: size)
         }
         return .system(size: size, weight: weight, design: .default)

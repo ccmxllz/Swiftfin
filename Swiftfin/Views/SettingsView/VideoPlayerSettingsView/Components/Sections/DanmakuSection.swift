@@ -38,6 +38,8 @@ extension VideoPlayerSettingsView {
         private var apiBaseURL
         @Default(.VideoPlayer.Overlay.danmakuPreferredSource)
         private var preferredSource
+        @Default(.VideoPlayer.Overlay.danmakuEnhancedShadow)
+        private var enhancedShadow
 
         var body: some View {
             Section {
@@ -63,6 +65,8 @@ extension VideoPlayerSettingsView {
                     .valueFormatter { value in
                         "\(Int(value))"
                     }
+
+                    Toggle("增强字体效果", isOn: $enhancedShadow)
 
                     BasicStepper(
                         title: "滚动速度",
@@ -117,7 +121,7 @@ extension VideoPlayerSettingsView {
             } header: {
                 Text("弹幕设置")
             } footer: {
-                Text("弹幕功能可以在视频播放时显示观众评论。可以设置显示区域大小和位置，类似腾讯视频的弹幕显示效果。")
+                Text("弹幕功能可以在视频播放时显示观众评论。增强字体效果可提供更粗的描边和阴影，类似腾讯视频的弹幕样式。")
             }
 
             // 服务器配置部分
