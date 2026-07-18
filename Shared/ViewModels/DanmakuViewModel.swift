@@ -114,14 +114,19 @@ final class DanmakuViewModel: ViewModel, Stateful {
     private var lastPublishedIds: [Int] = []
     private var inFlightSegmentLoads: Int = 0
 
+    /// Watermark: items with `progress <= emittedUntilMs` have already been handed to the renderer.
+    private var emittedUntilMs: Int = -1
+
     private let retainBehindSeconds = 300
     private let retainAheadSeconds = 600
     private let failedRetryInterval: TimeInterval = 30
     private let seekResetThreshold: Double = 1.5
 
-    /// Lookahead window for shooting (ms).
-    private let lookBehindMs = 80
-    private let lookAheadMs = 350
+    /// Catch-up after small stalls / seek (ms).
+    private let lookBehindMs = 200
+    /// Prefire buffer so the next wave is already in flight before the previous exits.
+    /// Needs to cover progress tick jitter; DanmakuKit still starts scroll at shoot time.
+    private let lookAheadMs = 2000
 
     // MARK: - Configuration Properties
 
@@ -226,6 +231,7 @@ final class DanmakuViewModel: ViewModel, Stateful {
             segmentStates.removeAll()
             lastPublishedIds.removeAll()
             lastPlaybackTime = -1
+            emittedUntilMs = -1
             bumpRenderEpoch()
             logger.info("Danmaku data cleared, will reload")
             return state
@@ -269,9 +275,15 @@ final class DanmakuViewModel: ViewModel, Stateful {
         segmentStates.removeAll()
         lastPublishedIds.removeAll()
         lastPlaybackTime = -1
+        emittedUntilMs = -1
         inFlightSegmentLoads = 0
         backgroundStates.remove(.loading)
         bumpRenderEpoch()
+    }
+
+    /// Soft per-tick emit cap (time-ordered). Remainder stays queued via `emittedUntilMs`.
+    private var maxEmitPerTick: Int {
+        max(40, maxDisplayCount * 2)
     }
 
     private func bumpRenderEpoch() {
@@ -301,9 +313,13 @@ final class DanmakuViewModel: ViewModel, Stateful {
         // Pause: keep existing on-screen danmaku; renderer freezes animation.
         guard !isPaused else { return }
 
+        let currentTimeMs = Int(currentTime * 1000)
+
         if lastPlaybackTime >= 0, abs(currentTime - lastPlaybackTime) > seekResetThreshold {
             bumpRenderEpoch()
             publishCurrentDanmakus([])
+            // Rewind watermark so the live window can be re-emitted after seek.
+            emittedUntilMs = max(-1, currentTimeMs - lookBehindMs - 1)
         }
         lastPlaybackTime = currentTime
 
@@ -311,33 +327,30 @@ final class DanmakuViewModel: ViewModel, Stateful {
         checkAndLoadDanmakuSegment(for: currentTimeSec)
         pruneIfNeeded(around: currentTimeSec)
 
-        guard !danmakus.isEmpty else {
-            publishCurrentDanmakus([])
-            return
-        }
+        guard !danmakus.isEmpty else { return }
 
-        let startTimeMs = max(0, Int(currentTime * 1000) - lookBehindMs)
-        let endTimeMs = Int(currentTime * 1000) + lookAheadMs
+        // Continuous cursor emit: hand over every due item in time order.
+        // Previous sliding-window + score truncate permanently dropped overflow,
+        // which showed up as empty gaps between batches on screen.
+        let emitUntilMs = currentTimeMs + lookAheadMs
+        let startMs = emittedUntilMs + 1
+        guard startMs <= emitUntilMs else { return }
 
-        let windowItems = items(inProgressRange: startTimeMs ... endTimeMs)
-        guard !windowItems.isEmpty else {
-            publishCurrentDanmakus([])
-            return
-        }
+        let dueItems = items(inProgressRange: startMs ... emitUntilMs)
+        guard !dueItems.isEmpty else { return }
 
-        let limited: [DanmakuItem]
-        if windowItems.count <= maxDisplayCount {
-            limited = windowItems
+        let batch: [DanmakuItem]
+        if dueItems.count <= maxEmitPerTick {
+            batch = dueItems
         } else {
-            limited = Array(
-                windowItems
-                    .sorted { $0.score > $1.score }
-                    .prefix(maxDisplayCount)
-                    .sorted { $0.progress < $1.progress }
-            )
+            batch = Array(dueItems.prefix(maxEmitPerTick))
         }
 
-        publishCurrentDanmakus(limited)
+        if let last = batch.last {
+            emittedUntilMs = last.progress
+        }
+
+        publishCurrentDanmakus(batch)
     }
 
     @MainActor
@@ -468,6 +481,11 @@ final class DanmakuViewModel: ViewModel, Stateful {
         segmentStates[segment] = .loaded
         mergeItems(items)
         logger.info("Successfully loaded danmaku segment \(startTime)-\(endTime): \(items.count) items")
+
+        // Don't wait for the next progress tick — fill any due gap immediately.
+        if lastPlaybackTime >= 0 {
+            updateDanmakus(at: lastPlaybackTime)
+        }
     }
 
     @MainActor
@@ -495,6 +513,11 @@ final class DanmakuViewModel: ViewModel, Stateful {
             .sorted { $0.progress < $1.progress }
 
         guard !uniqueNew.isEmpty else { return }
+
+        // Late-arriving items behind the watermark must be re-eligible to emit.
+        if let earliestNew = uniqueNew.first?.progress, earliestNew <= emittedUntilMs {
+            emittedUntilMs = earliestNew - 1
+        }
 
         if danmakus.isEmpty {
             danmakus = uniqueNew

@@ -231,8 +231,8 @@ extension Defaults.Keys {
 
             // Danmaku
             static let danmakuEnabled: Key<Bool> = UserKey("danmakuEnabled", default: true)
-            static let danmakuOpacity: Key<Double> = UserKey("danmakuOpacity", default: 0.8)
-            static let danmakuFontSize: Key<Double> = UserKey("danmakuFontSize", default: 16.0)
+            static let danmakuOpacity: Key<Double> = UserKey("danmakuOpacity", default: 0.92)
+            static let danmakuFontSize: Key<Double> = UserKey("danmakuFontSize", default: 17.0)
             static let danmakuSpeed: Key<Double> = UserKey("danmakuSpeed", default: 1.0)
             static let danmakuMaxDisplayCount: Key<Int> = UserKey("danmakuMaxDisplayCount", default: 20)
             static let danmakuShowTopComments: Key<Bool> = UserKey("danmakuShowTopComments", default: true)

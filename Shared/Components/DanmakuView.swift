@@ -42,8 +42,9 @@ struct DanmakuView: UIViewRepresentable {
             self.parent = parent
             super.init()
 
+            // No throttle: batching here was a major cause of on-screen gaps between waves.
             parent.viewModel.$currentDanmakus
-                .throttle(for: .milliseconds(300), scheduler: DispatchQueue.main, latest: true)
+                .receive(on: DispatchQueue.main)
                 .sink { [weak self] danmakus in
                     self?.processDanmakus(danmakus)
                 }

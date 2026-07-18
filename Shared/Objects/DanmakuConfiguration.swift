@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 // MARK: - DanmakuConfiguration
 
@@ -22,8 +23,8 @@ struct DanmakuConfiguration {
 
     static let `default` = DanmakuConfiguration(
         isEnabled: true,
-        opacity: 0.8,
-        fontSize: 16,
+        opacity: 0.92,
+        fontSize: 17,
         speed: 1.0,
         maxDisplayCount: 20,
         trackCount: 4
@@ -36,14 +37,14 @@ struct DanmakuFontConfiguration {
 
     // MARK: - Font Names
 
+    /// Prefer Medium — closer to Tencent's clean luminous weight than Semibold.
     private let preferredFontNames: [String] = [
-        "PingFangSC-Semibold", // 苹果默认中文字体（半粗体）
-        "PingFangSC-Medium", // 苹果默认中文字体
-        "HiraginoSansGB-W6", // 冬青黑体中粗
-        "STHeitiSC-Medium", // 华文黑体
-        "HiraginoSansGB-W3", // 冬青黑体
-        "HelveticaNeue-Bold", // 英文字体备选（粗体）
-        "HelveticaNeue-Medium", // 英文字体备选
+        "PingFangSC-Medium",
+        "PingFangSC-Regular",
+        "HiraginoSansGB-W3",
+        "PingFangSC-Semibold",
+        "STHeitiSC-Medium",
+        "HelveticaNeue-Medium",
     ]
 
     // MARK: - Shadow Configuration
@@ -55,16 +56,16 @@ struct DanmakuFontConfiguration {
         let color: CGColor
 
         static let standard = ShadowConfiguration(
-            opacity: 0.8,
-            radius: 1.0,
-            offset: CGSize(width: 1.0, height: 1.0),
+            opacity: 0.45,
+            radius: 1.5,
+            offset: CGSize(width: 0, height: 1.0),
             color: UIColor.black.cgColor
         )
 
         static let enhanced = ShadowConfiguration(
-            opacity: 1.0,
-            radius: 1.2,
-            offset: CGSize(width: 1.2, height: 1.2),
+            opacity: 0.55,
+            radius: 2.0,
+            offset: CGSize(width: 0, height: 1.2),
             color: UIColor.black.cgColor
         )
     }
@@ -77,14 +78,14 @@ struct DanmakuFontConfiguration {
                 return font
             }
         }
-        return UIFont.systemFont(ofSize: size, weight: .bold)
+        return UIFont.systemFont(ofSize: size, weight: .medium)
     }
 
-    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .bold) -> Font {
-        if UIFont(name: "PingFangSC-Semibold", size: size) != nil {
-            return .custom("PingFangSC-Semibold", size: size)
-        } else if UIFont(name: "PingFangSC-Medium", size: size) != nil {
+    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .medium) -> Font {
+        if UIFont(name: "PingFangSC-Medium", size: size) != nil {
             return .custom("PingFangSC-Medium", size: size)
+        } else if UIFont(name: "PingFangSC-Regular", size: size) != nil {
+            return .custom("PingFangSC-Regular", size: size)
         }
         return .system(size: size, weight: weight, design: .default)
     }
@@ -96,11 +97,11 @@ struct DanmakuFontConfiguration {
     func calculateTextWidth(text: String, font: UIFont) -> CGFloat {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .kern: 0.0,
+            .kern: 0.2,
         ]
 
         let size = (text as NSString).size(withAttributes: attributes)
-        let padding: CGFloat = 6.0
+        let padding: CGFloat = 8.0
         return ceil(size.width) + padding
     }
 
@@ -115,6 +116,6 @@ struct DanmakuFontConfiguration {
         }
 
         let adjustedSize = baseSize * multiplier
-        return max(14.0, min(22.0, adjustedSize))
+        return max(15.0, min(24.0, adjustedSize))
     }
 }

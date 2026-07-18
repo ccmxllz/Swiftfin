@@ -31,9 +31,10 @@ extension VideoPlayer {
         var body: some View {
             ZStack {
                 if danmakuViewModel.isEnabled {
+                    // Opacity is applied once inside DanmakuRenderer — avoid stacking
+                    // SwiftUI opacity on top or whites look dull/grey.
                     DanmakuView(viewModel: danmakuViewModel)
                         .allowsHitTesting(false)
-                        .opacity(danmakuViewModel.opacity)
                 }
             }
             .onReceive(videoPlayerManager.$currentViewModel) { viewModel in
