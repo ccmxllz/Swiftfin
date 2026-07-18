@@ -23,7 +23,6 @@ struct DanmakuView: UIViewRepresentable {
 
     @ObservedObject
     var viewModel: DanmakuViewModel
-    let currentTime: Double
 
     // MARK: - Coordinator
 
@@ -33,76 +32,86 @@ struct DanmakuView: UIViewRepresentable {
 
         var parent: DanmakuView
         var renderer: DanmakuRenderer?
-        var lastUpdateTime: Double = 0
-        var cancellable: AnyCancellable?
+        var cancellables = Set<AnyCancellable>()
         var processedDanmakuIds: Set<Int> = []
+        var lastSettings: DanmakuRenderSettings?
+        var lastPaused: Bool?
+        var lastEnabled: Bool?
 
         init(parent: DanmakuView) {
             self.parent = parent
             super.init()
 
-            // 订阅弹幕数据变化，降低刷新频率减少眼部疲劳
-            cancellable = parent.viewModel.$currentDanmakus
-                .throttle(for: .milliseconds(300), scheduler: DispatchQueue.global(), latest: true)
-                .receive(on: DispatchQueue.main)
+            parent.viewModel.$currentDanmakus
+                .throttle(for: .milliseconds(300), scheduler: DispatchQueue.main, latest: true)
                 .sink { [weak self] danmakus in
                     self?.processDanmakus(danmakus)
                 }
+                .store(in: &cancellables)
+
+            parent.viewModel.$renderEpoch
+                .dropFirst()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    self?.handleRenderEpochChange()
+                }
+                .store(in: &cancellables)
         }
 
         deinit {
-            cancellable?.cancel()
+            cancellables.forEach { $0.cancel() }
         }
 
         func processDanmakus(_ danmakus: [DanmakuItem]) {
             guard parent.viewModel.isEnabled, !danmakus.isEmpty else {
-                // 如果弹幕被禁用，清除已处理的ID记录
                 if !parent.viewModel.isEnabled {
                     processedDanmakuIds.removeAll()
                 }
                 return
             }
 
-            // 只处理新的弹幕
             let newDanmakus = danmakus.filter { !processedDanmakuIds.contains($0.id) }
+            guard !newDanmakus.isEmpty else { return }
 
-            if !newDanmakus.isEmpty {
-                logger.debug("Processing \(newDanmakus.count) new danmaku items")
-                renderer?.addDanmakuItems(newDanmakus)
+            logger.debug("Processing \(newDanmakus.count) new danmaku items")
+            renderer?.addDanmakuItems(newDanmakus)
 
-                // 记录已处理的弹幕ID
-                newDanmakus.forEach { processedDanmakuIds.insert($0.id) }
+            for item in newDanmakus {
+                processedDanmakuIds.insert(item.id)
+            }
 
-                // 限制记录的ID数量，避免内存泄漏
-                if processedDanmakuIds.count > 1000 {
-                    // 保留最近的500个ID
-                    let recentIds = Array(processedDanmakuIds.suffix(500))
-                    processedDanmakuIds = Set(recentIds)
-                }
+            if processedDanmakuIds.count > 1000 {
+                // Set has no stable order; drop all and keep only the latest batch.
+                processedDanmakuIds = Set(newDanmakus.map(\.id))
             }
         }
 
-        func updateSettings() {
-            renderer?.setOpacity(CGFloat(parent.viewModel.opacity))
-            renderer?.setSpeedMultiplier(CGFloat(parent.viewModel.speed))
-            renderer?.setEnabled(parent.viewModel.isEnabled)
-            renderer?.updateSettings() // 更新显示区域等设置
-
-            // 处理暂停/恢复状态
-            if parent.viewModel.isPaused {
-                renderer?.stopAnimation()
-            } else if parent.viewModel.isEnabled {
-                // 只有在启用弹幕且不暂停时才恢复动画
-                renderer?.setEnabled(true)
-            }
+        func handleRenderEpochChange() {
+            processedDanmakuIds.removeAll()
+            renderer?.clearAllDanmaku()
         }
 
-        func updateTime(_ currentTime: Double) {
-            // 降低时间更新频率，减少不必要的重绘
-            if abs(currentTime - lastUpdateTime) > 0.5 {
-                lastUpdateTime = currentTime
-                Task {
-                    await parent.viewModel.send(.updateCurrentTime(currentTime))
+        func applySettingsIfNeeded() {
+            let settings = DanmakuRenderSettings.current()
+            let enabled = parent.viewModel.isEnabled
+            let paused = parent.viewModel.isPaused
+
+            if lastSettings != settings {
+                lastSettings = settings
+                renderer?.apply(settings: settings)
+            }
+
+            if lastEnabled != enabled {
+                lastEnabled = enabled
+                renderer?.setEnabled(enabled)
+            }
+
+            if lastPaused != paused {
+                lastPaused = paused
+                if paused {
+                    renderer?.stopAnimation()
+                } else if enabled {
+                    renderer?.setEnabled(true)
                 }
             }
         }
@@ -122,27 +131,30 @@ struct DanmakuView: UIViewRepresentable {
         let renderer = DanmakuRenderer(containerView: view)
         context.coordinator.renderer = renderer
 
-        // 初始化设置
-        renderer.setOpacity(CGFloat(viewModel.opacity))
-        renderer.setSpeedMultiplier(CGFloat(viewModel.speed))
+        let settings = DanmakuRenderSettings.current()
+        context.coordinator.lastSettings = settings
+        context.coordinator.lastEnabled = viewModel.isEnabled
+        context.coordinator.lastPaused = viewModel.isPaused
+        renderer.apply(settings: settings)
         renderer.setEnabled(viewModel.isEnabled)
 
         return view
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.parent = self
+
         if uiView.bounds.size != .zero {
             context.coordinator.renderer?.setContainerSize(uiView.bounds.size)
         }
 
-        context.coordinator.updateSettings()
-        context.coordinator.updateTime(currentTime)
+        context.coordinator.applySettingsIfNeeded()
     }
 
     static func dismantleUIView(_ uiView: UIView, coordinator: Coordinator) {
         coordinator.renderer?.stopAnimation()
         coordinator.renderer?.clearAllDanmaku()
-        coordinator.cancellable?.cancel()
+        coordinator.cancellables.forEach { $0.cancel() }
     }
 }
 
@@ -151,7 +163,6 @@ struct DanmakuView: UIViewRepresentable {
 struct DanmakuView: View {
     @ObservedObject
     var viewModel: DanmakuViewModel
-    let currentTime: Double
 
     var body: some View {
         Text("弹幕功能仅支持iOS平台")

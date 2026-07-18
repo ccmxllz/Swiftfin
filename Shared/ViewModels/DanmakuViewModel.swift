@@ -8,6 +8,7 @@
 
 import Combine
 import Defaults
+import Factory
 import Foundation
 import JellyfinAPI
 import Logging
@@ -34,21 +35,18 @@ final class DanmakuViewModel: ViewModel, Stateful {
             switch (lhs, rhs) {
             case let (.setEnabled(lhsValue), .setEnabled(rhsValue)):
                 return lhsValue == rhsValue
-            case let (.setMedia(lhsItem, lhsParams), .setMedia(rhsItem, rhsParams)):
+            case let (.setMedia(lhsItem, _), .setMedia(rhsItem, _)):
                 return lhsItem.id == rhsItem.id
-            case let (.setMediaWithKeyword(lhsKeyword, lhsParams), .setMediaWithKeyword(rhsKeyword, rhsParams)):
+            case let (.setMediaWithKeyword(lhsKeyword, _), .setMediaWithKeyword(rhsKeyword, _)):
                 return lhsKeyword == rhsKeyword
             case let (.updateCurrentTime(lhsTime), .updateCurrentTime(rhsTime)):
                 return abs(lhsTime - rhsTime) < 0.1
             case let (.loadSegment(lhsStart, lhsEnd), .loadSegment(rhsStart, rhsEnd)):
                 return lhsStart == rhsStart && lhsEnd == rhsEnd
-            case (.clearDanmakus, .clearDanmakus):
-                return true
-            case (.reloadDanmakus, .reloadDanmakus):
-                return true
-            case (.pauseDanmaku, .pauseDanmaku):
-                return true
-            case (.resumeDanmaku, .resumeDanmaku):
+            case (.clearDanmakus, .clearDanmakus),
+                 (.reloadDanmakus, .reloadDanmakus),
+                 (.pauseDanmaku, .pauseDanmaku),
+                 (.resumeDanmaku, .resumeDanmaku):
                 return true
             case let (.error(lhsError), .error(rhsError)):
                 return lhsError.localizedDescription == rhsError.localizedDescription
@@ -73,6 +71,15 @@ final class DanmakuViewModel: ViewModel, Stateful {
         case error(JellyfinAPIError)
     }
 
+    // MARK: - SegmentLoadState
+
+    private enum SegmentLoadState: Equatable {
+        case loading
+        case loaded
+        case empty
+        case failed(Date)
+    }
+
     // MARK: - Published Properties
 
     @Published
@@ -90,19 +97,31 @@ final class DanmakuViewModel: ViewModel, Stateful {
     @Published
     var isPaused: Bool = false
 
+    /// Incremented on large seeks / reload so the renderer can reset dedupe state.
+    @Published
+    private(set) var renderEpoch: UInt = 0
+
     // MARK: - Private Properties
 
-    private var danmakuService: DanmakuService = DanmakuService()
+    @Injected(\.danmakuService)
+    private var danmakuService: DanmakuService
 
     private var mediaKeyword: String = ""
     private var seriesParams: SeriesDanmakuParams?
-    private var loadedTimeSegments: Set<Int> = []
-    private let segmentDuration = 30
+    private var segmentStates: [Int: SegmentLoadState] = [:]
 
-    // 弹幕缓存
-    private var danmakuCache: [String: [DanmakuItem]] = [:]
-    private var lastCacheTime: Double = -1
-    private let cacheValidDuration: Double = 2.0
+    private var lastPlaybackTime: Double = -1
+    private var lastPublishedIds: [Int] = []
+    private var inFlightSegmentLoads: Int = 0
+
+    private let retainBehindSeconds = 300
+    private let retainAheadSeconds = 600
+    private let failedRetryInterval: TimeInterval = 30
+    private let seekResetThreshold: Double = 1.5
+
+    /// Lookahead window for shooting (ms).
+    private let lookBehindMs = 80
+    private let lookAheadMs = 350
 
     // MARK: - Configuration Properties
 
@@ -134,26 +153,34 @@ final class DanmakuViewModel: ViewModel, Stateful {
         Defaults[.VideoPlayer.Overlay.danmakuPlatform]
     }
 
+    /// Align client windows with native source segment sizes where known.
+    private var segmentDuration: Int {
+        switch danmakuPlatform {
+        case "bilibili":
+            return 360
+        default:
+            return 30
+        }
+    }
+
     // MARK: - Initialization
 
     override init() {
         super.init()
 
-        // 监听设置变化
         Defaults.publisher(.VideoPlayer.Overlay.danmakuEnabled)
             .sink { [weak self] change in
-                Task {
-                    await self?.send(.setEnabled(change.newValue))
+                Task { @MainActor in
+                    self?.send(.setEnabled(change.newValue))
                 }
             }
             .store(in: &cancellables)
 
-        // 监听弹幕平台变化
         Defaults.publisher(.VideoPlayer.Overlay.danmakuPlatform)
             .sink { [weak self] change in
                 self?.logger.info("Danmaku platform changed: \(change.oldValue) -> \(change.newValue)")
-                Task {
-                    await self?.send(.reloadDanmakus)
+                Task { @MainActor in
+                    self?.send(.reloadDanmakus)
                 }
             }
             .store(in: &cancellables)
@@ -167,54 +194,21 @@ final class DanmakuViewModel: ViewModel, Stateful {
         case let .setEnabled(enabled):
             logger.debug("Danmaku enabled state changed: \(enabled)")
             if !enabled {
-                currentDanmakus = []
+                publishCurrentDanmakus([])
             }
             return state
 
         case let .setMedia(item, seriesParams):
             self.seriesParams = seriesParams
-
-            // 提取媒体关键词
             mediaKeyword = extractMediaKeyword(from: item)
-
-            logger.info("Danmaku media keyword: '\(mediaKeyword)'")
-            logger.debug("Series parameters: \(String(describing: seriesParams))")
-
-            if mediaKeyword.isEmpty {
-                logger.warning("Media keyword is empty")
-                return .error(.init("无效的媒体标题"))
-            }
-
-            // 清除旧数据
-            danmakus.removeAll()
-            currentDanmakus.removeAll()
-            loadedTimeSegments.removeAll()
-
-            logger.info("Danmaku system ready")
-            return .ready
+            return prepareForNewMedia()
 
         case let .setMediaWithKeyword(keyword, seriesParams):
             self.seriesParams = seriesParams
-            self.mediaKeyword = keyword
-
-            logger.info("Danmaku media keyword: '\(mediaKeyword)'")
-            logger.debug("Series parameters: \(String(describing: seriesParams))")
-
-            if mediaKeyword.isEmpty {
-                logger.warning("Media keyword is empty")
-                return .error(.init("无效的媒体标题"))
-            }
-
-            // 清除旧数据
-            danmakus.removeAll()
-            currentDanmakus.removeAll()
-            loadedTimeSegments.removeAll()
-
-            logger.info("Danmaku system ready")
-            return .ready
+            mediaKeyword = keyword
+            return prepareForNewMedia()
 
         case let .updateCurrentTime(currentTime):
-            logger.trace("Update playback time: \(currentTime)s, danmaku enabled: \(isEnabled)")
             updateDanmakus(at: currentTime)
             return state
 
@@ -223,17 +217,16 @@ final class DanmakuViewModel: ViewModel, Stateful {
             return state
 
         case .clearDanmakus:
-            danmakus.removeAll()
-            currentDanmakus.removeAll()
-            loadedTimeSegments.removeAll()
+            resetAllData()
             return .initial
 
         case .reloadDanmakus:
-            // 清除已加载的弹幕数据，强制重新加载
             danmakus.removeAll()
-            currentDanmakus.removeAll()
-            loadedTimeSegments.removeAll()
-            danmakuCache.removeAll()
+            publishCurrentDanmakus([])
+            segmentStates.removeAll()
+            lastPublishedIds.removeAll()
+            lastPlaybackTime = -1
+            bumpRenderEpoch()
             logger.info("Danmaku data cleared, will reload")
             return state
 
@@ -254,14 +247,43 @@ final class DanmakuViewModel: ViewModel, Stateful {
 
     // MARK: - Private Methods
 
+    @MainActor
+    private func prepareForNewMedia() -> State {
+        logger.info("Danmaku media keyword: '\(mediaKeyword)'")
+        logger.debug("Series parameters: \(String(describing: seriesParams))")
+
+        if mediaKeyword.isEmpty {
+            logger.warning("Media keyword is empty")
+            return .error(.init("无效的媒体标题"))
+        }
+
+        resetAllData()
+        logger.info("Danmaku system ready")
+        return .ready
+    }
+
+    @MainActor
+    private func resetAllData() {
+        danmakus.removeAll()
+        publishCurrentDanmakus([])
+        segmentStates.removeAll()
+        lastPublishedIds.removeAll()
+        lastPlaybackTime = -1
+        inFlightSegmentLoads = 0
+        backgroundStates.remove(.loading)
+        bumpRenderEpoch()
+    }
+
+    private func bumpRenderEpoch() {
+        renderEpoch &+= 1
+    }
+
     private func extractMediaKeyword(from item: BaseItemDto) -> String {
-        // 优先使用 displayTitle
         let displayTitle = item.displayTitle
         if !displayTitle.isEmpty {
             return displayTitle
         }
 
-        // 备选使用 name
         if let name = item.name, !name.isEmpty {
             return name
         }
@@ -269,94 +291,147 @@ final class DanmakuViewModel: ViewModel, Stateful {
         return ""
     }
 
+    @MainActor
     private func updateDanmakus(at currentTime: Double) {
-        guard isEnabled && !isPaused else {
-            if !currentDanmakus.isEmpty && isPaused {
-                // 暂停时清空当前弹幕，但不清空已加载的弹幕数据
-                currentDanmakus = []
-            } else if !isEnabled && !currentDanmakus.isEmpty {
-                currentDanmakus = []
-            }
+        guard isEnabled else {
+            publishCurrentDanmakus([])
             return
         }
 
-        // 检查并加载新的弹幕段（即使当前没有弹幕数据）
-        checkAndLoadDanmakuSegment(for: Int(currentTime))
+        // Pause: keep existing on-screen danmaku; renderer freezes animation.
+        guard !isPaused else { return }
 
-        // 如果还没有弹幕数据，直接返回
+        if lastPlaybackTime >= 0, abs(currentTime - lastPlaybackTime) > seekResetThreshold {
+            bumpRenderEpoch()
+            publishCurrentDanmakus([])
+        }
+        lastPlaybackTime = currentTime
+
+        let currentTimeSec = Int(currentTime)
+        checkAndLoadDanmakuSegment(for: currentTimeSec)
+        pruneIfNeeded(around: currentTimeSec)
+
         guard !danmakus.isEmpty else {
+            publishCurrentDanmakus([])
             return
         }
 
-        // 时间范围筛选
-        let startTimeMs = max(0, Int(currentTime * 1000) - 80)
-        let endTimeMs = Int(currentTime * 1000) + 350
+        let startTimeMs = max(0, Int(currentTime * 1000) - lookBehindMs)
+        let endTimeMs = Int(currentTime * 1000) + lookAheadMs
 
-        // 缓存检查
-        let cacheKey = "\(startTimeMs)-\(endTimeMs)"
-        let timeDiff = abs(currentTime - lastCacheTime)
-
-        if timeDiff < cacheValidDuration, let cachedDanmakus = danmakuCache[cacheKey] {
-            currentDanmakus = cachedDanmakus
+        let windowItems = items(inProgressRange: startTimeMs ... endTimeMs)
+        guard !windowItems.isEmpty else {
+            publishCurrentDanmakus([])
             return
         }
 
-        // 筛选当前时间段的弹幕
-        let filteredDanmakus = danmakus.filter { danmaku in
-            danmaku.progress >= startTimeMs && danmaku.progress <= endTimeMs
+        let limited: [DanmakuItem]
+        if windowItems.count <= maxDisplayCount {
+            limited = windowItems
+        } else {
+            limited = Array(
+                windowItems
+                    .sorted { $0.score > $1.score }
+                    .prefix(maxDisplayCount)
+                    .sorted { $0.progress < $1.progress }
+            )
         }
 
-        // 按评分排序并限制数量
-        let sortedDanmakus = filteredDanmakus
-            .sorted { $0.score > $1.score }
-            .prefix(maxDisplayCount)
-            .sorted { $0.progress < $1.progress }
-
-        currentDanmakus = Array(sortedDanmakus)
-
-        // 更新缓存
-        danmakuCache[cacheKey] = currentDanmakus
-        lastCacheTime = currentTime
-
-        // 清理过期缓存
-        if danmakuCache.count > 10 {
-            danmakuCache.removeAll()
-        }
+        publishCurrentDanmakus(limited)
     }
 
+    @MainActor
+    private func publishCurrentDanmakus(_ items: [DanmakuItem]) {
+        let ids = items.map(\.id)
+        guard ids != lastPublishedIds else { return }
+        lastPublishedIds = ids
+        currentDanmakus = items
+    }
+
+    /// Binary search over `danmakus` sorted by `progress`.
+    private func items(inProgressRange range: ClosedRange<Int>) -> [DanmakuItem] {
+        let lower = lowerBound(progress: range.lowerBound)
+        let upper = upperBound(progress: range.upperBound)
+        guard lower < upper else { return [] }
+        return Array(danmakus[lower ..< upper])
+    }
+
+    private func lowerBound(progress: Int) -> Int {
+        var low = 0
+        var high = danmakus.count
+        while low < high {
+            let mid = (low + high) / 2
+            if danmakus[mid].progress < progress {
+                low = mid + 1
+            } else {
+                high = mid
+            }
+        }
+        return low
+    }
+
+    private func upperBound(progress: Int) -> Int {
+        var low = 0
+        var high = danmakus.count
+        while low < high {
+            let mid = (low + high) / 2
+            if danmakus[mid].progress <= progress {
+                low = mid + 1
+            } else {
+                high = mid
+            }
+        }
+        return low
+    }
+
+    @MainActor
     private func checkAndLoadDanmakuSegment(for currentTimeSec: Int) {
         let currentSegment = currentTimeSec / segmentDuration
-
+        // Current + one ahead keeps RTT low; -1 covers seek-back into prior window.
         let segmentsToLoad = [
             max(0, currentSegment - 1),
             currentSegment,
             currentSegment + 1,
-            currentSegment + 2,
         ]
 
-        for segment in segmentsToLoad {
-            if segment >= 0 && !loadedTimeSegments.contains(segment) {
-                loadedTimeSegments.insert(segment)
-
+        for segment in Set(segmentsToLoad) where segment >= 0 {
+            if shouldLoad(segment: segment) {
+                segmentStates[segment] = .loading
                 let startTime = segment * segmentDuration
                 let endTime = startTime + segmentDuration
-
-                Task {
-                    await send(.loadSegment(startTime, endTime))
+                Task { @MainActor in
+                    send(.loadSegment(startTime, endTime))
                 }
             }
         }
     }
 
+    private func shouldLoad(segment: Int) -> Bool {
+        switch segmentStates[segment] {
+        case .none:
+            return true
+        case .loading, .loaded, .empty:
+            return false
+        case let .failed(date):
+            return Date().timeIntervalSince(date) >= failedRetryInterval
+        }
+    }
+
+    private func segmentIndex(forStart startTime: Int) -> Int {
+        startTime / segmentDuration
+    }
+
+    @MainActor
     private func loadDanmakuSegment(startTime: Int, endTime: Int) {
         guard !mediaKeyword.isEmpty else {
             logger.warning("Media keyword is empty, skipping danmaku loading")
             return
         }
 
-        logger.debug("Loading danmaku segment: \(startTime)-\(endTime)s")
-        logger.trace("Keyword: '\(mediaKeyword)', platform: \(danmakuPlatform)")
+        let segment = segmentIndex(forStart: startTime)
+        logger.debug("Loading danmaku segment: \(startTime)-\(endTime)s (index \(segment))")
 
+        inFlightSegmentLoads += 1
         backgroundStates.insert(.loading)
 
         Task {
@@ -370,16 +445,99 @@ final class DanmakuViewModel: ViewModel, Stateful {
                 )
 
                 await MainActor.run {
-                    self.danmakus.append(contentsOf: items)
-                    self.backgroundStates.remove(.loading)
-                    self.logger.info("Successfully loaded danmaku segment \(startTime)-\(endTime): \(items.count) items")
+                    self.finishSegmentLoad(segment: segment, items: items, startTime: startTime, endTime: endTime)
                 }
             } catch {
                 await MainActor.run {
-                    self.backgroundStates.remove(.loading)
-                    self.logger.error("Failed to load danmaku: \(error.localizedDescription)")
+                    self.failSegmentLoad(segment: segment, error: error)
                 }
             }
         }
+    }
+
+    @MainActor
+    private func finishSegmentLoad(segment: Int, items: [DanmakuItem], startTime: Int, endTime: Int) {
+        defer { completeBackgroundLoading() }
+
+        if items.isEmpty {
+            segmentStates[segment] = .empty
+            logger.info("Empty danmaku segment \(startTime)-\(endTime)")
+            return
+        }
+
+        segmentStates[segment] = .loaded
+        mergeItems(items)
+        logger.info("Successfully loaded danmaku segment \(startTime)-\(endTime): \(items.count) items")
+    }
+
+    @MainActor
+    private func failSegmentLoad(segment: Int, error: Error) {
+        defer { completeBackgroundLoading() }
+        segmentStates[segment] = .failed(Date())
+        logger.error("Failed to load danmaku segment \(segment): \(error.localizedDescription)")
+    }
+
+    @MainActor
+    private func completeBackgroundLoading() {
+        inFlightSegmentLoads = max(0, inFlightSegmentLoads - 1)
+        if inFlightSegmentLoads == 0 {
+            backgroundStates.remove(.loading)
+        }
+    }
+
+    @MainActor
+    private func mergeItems(_ newItems: [DanmakuItem]) {
+        guard !newItems.isEmpty else { return }
+
+        var existingIDs = Set(danmakus.map(\.id))
+        let uniqueNew = newItems
+            .filter { existingIDs.insert($0.id).inserted }
+            .sorted { $0.progress < $1.progress }
+
+        guard !uniqueNew.isEmpty else { return }
+
+        if danmakus.isEmpty {
+            danmakus = uniqueNew
+            return
+        }
+
+        var merged: [DanmakuItem] = []
+        merged.reserveCapacity(danmakus.count + uniqueNew.count)
+
+        var i = 0
+        var j = 0
+        while i < danmakus.count, j < uniqueNew.count {
+            if danmakus[i].progress <= uniqueNew[j].progress {
+                merged.append(danmakus[i])
+                i += 1
+            } else {
+                merged.append(uniqueNew[j])
+                j += 1
+            }
+        }
+        if i < danmakus.count {
+            merged.append(contentsOf: danmakus[i...])
+        }
+        if j < uniqueNew.count {
+            merged.append(contentsOf: uniqueNew[j...])
+        }
+        danmakus = merged
+    }
+
+    @MainActor
+    private func pruneIfNeeded(around currentTimeSec: Int) {
+        let minMs = max(0, (currentTimeSec - retainBehindSeconds) * 1000)
+        let maxMs = (currentTimeSec + retainAheadSeconds) * 1000
+
+        let lower = lowerBound(progress: minMs)
+        let upper = upperBound(progress: maxMs)
+
+        if lower > 0 || upper < danmakus.count {
+            danmakus = Array(danmakus[lower ..< upper])
+        }
+
+        let minSeg = max(0, (currentTimeSec - retainBehindSeconds) / segmentDuration - 1)
+        let maxSeg = (currentTimeSec + retainAheadSeconds) / segmentDuration + 1
+        segmentStates = segmentStates.filter { $0.key >= minSeg && $0.key <= maxSeg }
     }
 }

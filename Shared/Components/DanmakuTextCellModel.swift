@@ -7,7 +7,6 @@
 //
 
 import DanmakuKit
-import Defaults
 import Foundation
 import UIKit
 
@@ -38,24 +37,50 @@ class DanmakuTextCellModel: DanmakuCellModel {
     var shadowOffset = CGSize(width: 1.0, height: 1.0)
     var shadowBlurRadius: CGFloat = 1.0
     var shadowColor = UIColor.black.withAlphaComponent(0.6)
+    var smoothMode = true
+    var textAlpha: CGFloat = 0.95
+    var strokeAlpha: CGFloat = 0.7
 
     // MARK: - 初始化
 
-    init(danmakuItem: DanmakuItem) {
-        self.identifier = UUID().uuidString
+    init(danmakuItem: DanmakuItem, settings: DanmakuRenderSettings, font: UIFont) {
+        self.identifier = String(danmakuItem.id)
         self.text = danmakuItem.content
         self.textColor = UIColor(danmakuItem.displayColor)
+        self.font = font
+        self.smoothMode = settings.smoothMode
 
-        // 根据弹幕类型设置显示类型
         switch danmakuItem.mode {
-        case 1, 2, 3: // 滚动弹幕
+        case 1, 2, 3:
             self.type = .floating
-        case 4: // 底部弹幕
+        case 4:
             self.type = .bottom
-        case 5: // 顶部弹幕
+        case 5:
             self.type = .top
         default:
             self.type = .floating
+        }
+
+        if settings.enhancedShadow {
+            self.shadowOffset = CGSize(width: 1.2, height: 1.2)
+            self.shadowBlurRadius = 1.2
+            self.shadowColor = UIColor.black.withAlphaComponent(1.0)
+            self.strokeWidth = 2.5
+        } else {
+            self.shadowOffset = CGSize(width: 1.0, height: 1.0)
+            self.shadowBlurRadius = 1.0
+            self.shadowColor = UIColor.black.withAlphaComponent(0.6)
+            self.strokeWidth = 2.0
+        }
+
+        if settings.smoothMode {
+            self.textAlpha = 0.9
+            self.strokeAlpha = 0.6
+            self.strokeWidth *= 0.6
+        } else {
+            self.textAlpha = 0.95
+            self.strokeAlpha = 0.7
+            self.strokeWidth *= 0.8
         }
 
         calculateSize()
@@ -75,7 +100,6 @@ class DanmakuTextCellModel: DanmakuCellModel {
             context: nil
         ).size
 
-        // 添加一些边距
         size.width += 4
         size.height += 2
     }
@@ -110,51 +134,40 @@ class DanmakuTextCell: DanmakuCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func willDisplay() {
-        // 弹幕即将显示时的回调
-    }
+    override func willDisplay() {}
 
     override func displaying(_ context: CGContext, _ size: CGSize, _ isCancelled: Bool) {
         guard let model = model as? DanmakuTextCellModel else { return }
 
         let text = NSString(string: model.text)
 
-        // 启用抗锯齿和平滑渲染，减少锐利感
         context.setAllowsAntialiasing(true)
         context.setShouldAntialias(true)
         context.setAllowsFontSmoothing(true)
         context.setShouldSmoothFonts(true)
-        context.interpolationQuality = .high
+        context.interpolationQuality = model.smoothMode ? .default : .high
 
-        // 设置阴影
         context.setShadow(
             offset: model.shadowOffset,
             blur: model.shadowBlurRadius,
             color: model.shadowColor.cgColor
         )
 
-        // 设置描边属性
         context.setLineWidth(model.strokeWidth)
         context.setLineJoin(.round)
         context.setLineCap(.round)
         context.setStrokeColor(model.strokeColor.cgColor)
 
-        // 根据柔和模式设置渲染参数
-        let smoothMode = Defaults[.VideoPlayer.Overlay.danmakuSmoothMode]
-
         let attributes: [NSAttributedString.Key: Any] = [
             .font: model.font,
-            .foregroundColor: model.textColor.withAlphaComponent(smoothMode ? 0.9 : 0.95),
-            .strokeColor: model.strokeColor.withAlphaComponent(smoothMode ? 0.6 : 0.7),
-            .strokeWidth: -(model.strokeWidth * (smoothMode ? 0.6 : 0.8)), // 柔和模式使用更细的描边
+            .foregroundColor: model.textColor.withAlphaComponent(model.textAlpha),
+            .strokeColor: model.strokeColor.withAlphaComponent(model.strokeAlpha),
+            .strokeWidth: -model.strokeWidth,
         ]
 
-        // 清除阴影后绘制文字
         context.setShadow(offset: CGSize.zero, blur: 0, color: nil)
         text.draw(at: .zero, withAttributes: attributes)
     }
 
-    override func didDisplay(_ finished: Bool) {
-        // 弹幕显示完成时的回调
-    }
+    override func didDisplay(_ finished: Bool) {}
 }

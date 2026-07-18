@@ -410,6 +410,8 @@
 		5F1DF6342DF336E100DBFC90 /* DanmakuComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */; };
 		5F1DF6352DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */; };
 		5F1DF6362DF336E100DBFC90 /* DanmakuComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */; };
+		5F251E0E2DF70B0100F5EDCA /* DanmakuRenderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F251E0F2DF70B0100F5EDCA /* DanmakuRenderSettings.swift */; };
+		5F251E102DF70B0100F5EDCA /* DanmakuRenderSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F251E0F2DF70B0100F5EDCA /* DanmakuRenderSettings.swift */; };
 		5F1DF6382DF3371400DBFC90 /* DanmakuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */; };
 		5F1DF6392DF3371400DBFC90 /* DanmakuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */; };
 		5F1DF63B2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */; };
@@ -1614,6 +1616,7 @@
 		5F1DF62C2DF3361400DBFC90 /* DanmakuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuView.swift; sourceTree = "<group>"; };
 		5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuComment.swift; sourceTree = "<group>"; };
 		5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuConfiguration.swift; sourceTree = "<group>"; };
+		5F251E0F2DF70B0100F5EDCA /* DanmakuRenderSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuRenderSettings.swift; sourceTree = "<group>"; };
 		5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuService.swift; sourceTree = "<group>"; };
 		5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuViewModel.swift; sourceTree = "<group>"; };
 		5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuActionButton.swift; sourceTree = "<group>"; };
@@ -3445,6 +3448,7 @@
 			children = (
 				5F1DF6312DF336E100DBFC90 /* DanmakuComment.swift */,
 				5F1DF6322DF336E100DBFC90 /* DanmakuConfiguration.swift */,
+				5F251E0F2DF70B0100F5EDCA /* DanmakuRenderSettings.swift */,
 				E1D4BF802719D22800A11E64 /* AppAppearance.swift */,
 				E1CB75742C80EAFA00217C76 /* ArrayBuilder.swift */,
 				E11562942C818CB2001D5DE4 /* BindingBox.swift */,
@@ -5939,6 +5943,7 @@
 				E18E021E2887492B0022598C /* RowDivider.swift in Sources */,
 				5F1DF6352DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */,
 				5F1DF6362DF336E100DBFC90 /* DanmakuComment.swift in Sources */,
+				5F251E102DF70B0100F5EDCA /* DanmakuRenderSettings.swift in Sources */,
 				4E49DED62CE54D9D00352DCD /* LoginFailurePolicy.swift in Sources */,
 				E1DC983E296DEB9B00982F06 /* UnwatchedIndicator.swift in Sources */,
 				4E2AC4BF2C6C48D200DD600D /* CustomDeviceProfileAction.swift in Sources */,
@@ -6474,6 +6479,7 @@
 				E170D103294CE8BF0017224C /* LoadingView.swift in Sources */,
 				5F1DF6332DF336E100DBFC90 /* DanmakuConfiguration.swift in Sources */,
 				5F1DF6342DF336E100DBFC90 /* DanmakuComment.swift in Sources */,
+				5F251E0E2DF70B0100F5EDCA /* DanmakuRenderSettings.swift in Sources */,
 				6220D0AD26D5EABB00B8E046 /* ViewExtensions.swift in Sources */,
 				E15D63ED2BD622A700AA665D /* CompactChannelView.swift in Sources */,
 				E18A8E8528D60D0000333B9A /* VideoPlayerCoordinator.swift in Sources */,

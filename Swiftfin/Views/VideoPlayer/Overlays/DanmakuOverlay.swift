@@ -31,53 +31,44 @@ extension VideoPlayer {
         var body: some View {
             ZStack {
                 if danmakuViewModel.isEnabled {
-                    DanmakuView(
-                        viewModel: danmakuViewModel,
-                        currentTime: Double(videoPlayerManager.currentProgressHandler.seconds)
-                    )
-                    .allowsHitTesting(false)
-                    .opacity(danmakuViewModel.opacity)
+                    DanmakuView(viewModel: danmakuViewModel)
+                        .allowsHitTesting(false)
+                        .opacity(danmakuViewModel.opacity)
                 }
             }
             .onReceive(videoPlayerManager.$currentViewModel) { viewModel in
                 logger.debug("Current view model changed: \(viewModel?.item.displayTitle ?? "nil")")
-                if let viewModel = viewModel {
+                if let viewModel {
                     setupDanmakuForItem(viewModel)
                 } else {
                     logger.debug("Clearing danmaku data")
-                    Task {
-                        await danmakuViewModel.send(.clearDanmakus)
+                    Task { @MainActor in
+                        danmakuViewModel.send(.clearDanmakus)
                     }
                 }
             }
             .onReceive(videoPlayerManager.$state) { state in
-                // 当播放器状态变化时，同步弹幕状态
-                switch state {
-                case .stopped, .error:
-                    Task {
-                        await danmakuViewModel.send(.clearDanmakus)
+                Task { @MainActor in
+                    switch state {
+                    case .stopped, .error:
+                        danmakuViewModel.send(.clearDanmakus)
+                    case .paused:
+                        danmakuViewModel.send(.pauseDanmaku)
+                    case .playing:
+                        danmakuViewModel.send(.resumeDanmaku)
+                    default:
+                        break
                     }
-                case .paused:
-                    Task {
-                        await danmakuViewModel.send(.pauseDanmaku)
-                    }
-                case .playing:
-                    Task {
-                        await danmakuViewModel.send(.resumeDanmaku)
-                    }
-                default:
-                    break
                 }
             }
+            // Single clock path for danmaku sync (DanmakuView no longer updates time).
             .onReceive(videoPlayerManager.currentProgressHandler.$seconds) { seconds in
-                // 监听播放时间变化，更新弹幕
-                Task {
-                    await danmakuViewModel.send(.updateCurrentTime(Double(seconds)))
+                Task { @MainActor in
+                    danmakuViewModel.send(.updateCurrentTime(Double(seconds)))
                 }
             }
             .onAppear {
                 logger.debug("DanmakuOverlay appeared")
-                // 检查是否已经有当前视频
                 if let currentViewModel = videoPlayerManager.currentViewModel {
                     logger.debug("Found existing video: \(currentViewModel.item.displayTitle)")
                     setupDanmakuForItem(currentViewModel)
@@ -105,8 +96,8 @@ extension VideoPlayer {
 
             logger.debug("Series parameters: \(String(describing: seriesParams))")
 
-            Task {
-                await danmakuViewModel.send(.setMediaWithKeyword(mediaKeyword, seriesParams))
+            Task { @MainActor in
+                danmakuViewModel.send(.setMediaWithKeyword(mediaKeyword, seriesParams))
             }
         }
 

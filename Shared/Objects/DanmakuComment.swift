@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 // MARK: - DanmakuPosition
 
@@ -90,6 +91,21 @@ struct DanmakuResponse: Codable {
     let chatServer: String
     let source: String
     let items: [DanmakuItem]
+
+    private enum CodingKeys: String, CodingKey {
+        case chatId
+        case chatServer
+        case source
+        case items
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        chatId = try container.decodeIfPresent(Int.self, forKey: .chatId) ?? 0
+        chatServer = try container.decodeIfPresent(String.self, forKey: .chatServer) ?? ""
+        source = try container.decodeIfPresent(String.self, forKey: .source) ?? ""
+        items = try container.decodeIfPresent([DanmakuItem].self, forKey: .items) ?? []
+    }
 }
 
 // MARK: - SeriesDanmakuParams (保持与参考实现兼容)

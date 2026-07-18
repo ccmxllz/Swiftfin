@@ -33,8 +33,9 @@ final class DanmakuService {
     private var baseURL: String {
         let configuredURL = Defaults[.VideoPlayer.Overlay.danmakuAPIBaseURL]
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        if configuredURL.isEmpty {
-            return "http://192.168.50.112:8080/danmu/api/danmu" // 默认地址
+        guard !configuredURL.isEmpty else {
+            logger.warning("Danmaku API base URL is empty")
+            return ""
         }
         return configuredURL.hasSuffix("/") ? String(configuredURL.dropLast()) : configuredURL
     }
@@ -48,7 +49,7 @@ final class DanmakuService {
     ///   - start: 起始时间(秒)
     ///   - end: 结束时间(秒)
     ///   - seriesParams: 系列参数(season, episode, mediaType)
-    /// - Returns: 弹幕数组
+    /// - Returns: 弹幕数组；空段返回 `[]`（含 HTTP 404）
     func fetchDanmakuSegment(
         platform: String,
         keyword: String,
@@ -66,11 +67,11 @@ final class DanmakuService {
         guard !trimmedPlatform.isEmpty else {
             throw DanmakuError.invalidURL
         }
-
-        guard var url = URL(string: baseURL) else {
+        guard !baseURL.isEmpty, var url = URL(string: baseURL) else {
             logger.error("弹幕 API 地址无效: \(baseURL)")
             throw DanmakuError.invalidURL
         }
+
         url.appendPathComponent(trimmedPlatform)
         url.appendPathComponent("segment.json")
 
@@ -85,47 +86,53 @@ final class DanmakuService {
             URLQueryItem(name: "end", value: "\(end)"),
         ]
 
-        // 添加系列参数
-        if let seriesParams = seriesParams {
+        if let seriesParams {
             let isMovie = seriesParams.mediaType == 1
 
             if isMovie {
                 if let mediaType = seriesParams.mediaType {
                     queryItems.append(URLQueryItem(name: "mediaType", value: "\(mediaType)"))
-                    logger.debug("电影类型，添加媒体类型参数: mediaType=\(mediaType)")
                 }
             } else {
                 if let season = seriesParams.season {
                     queryItems.append(URLQueryItem(name: "season", value: "\(season)"))
-                    logger.debug("添加季数参数: season=\(season)")
                 }
                 if let episode = seriesParams.episode {
                     queryItems.append(URLQueryItem(name: "episode", value: "\(episode)"))
-                    logger.debug("添加集数参数: episode=\(episode)")
                 }
                 if let mediaType = seriesParams.mediaType {
                     queryItems.append(URLQueryItem(name: "mediaType", value: "\(mediaType)"))
-                    logger.debug("添加媒体类型参数: mediaType=\(mediaType)")
                 }
             }
         }
 
         urlComponents.queryItems = queryItems
 
-        guard let url = urlComponents.url else {
+        guard let requestURL = urlComponents.url else {
             throw DanmakuError.invalidURL
         }
 
-        logger.debug("请求弹幕数据: \(url.absoluteString)")
+        logger.debug("请求弹幕数据: \(requestURL.absoluteString)")
 
-        let (data, response) = try await session.data(from: url)
+        let (data, response) = try await session.data(from: requestURL)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200
-        else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-            logger.error("弹幕响应异常: 状态码\(statusCode)")
-            throw DanmakuError.invalidResponse(statusCode)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw DanmakuError.invalidResponse(0)
+        }
+
+        // Empty segment: treat as success with no items (legacy servers may still 404).
+        if httpResponse.statusCode == 404 {
+            logger.debug("弹幕分段为空 (404): \(start)-\(end)s")
+            return []
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            logger.error("弹幕响应异常: 状态码\(httpResponse.statusCode)")
+            throw DanmakuError.invalidResponse(httpResponse.statusCode)
+        }
+
+        if data.isEmpty {
+            return []
         }
 
         do {

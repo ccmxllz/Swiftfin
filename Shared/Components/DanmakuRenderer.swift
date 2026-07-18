@@ -7,7 +7,6 @@
 //
 
 import DanmakuKit
-import Defaults
 import Factory
 import Foundation
 import Logging
@@ -29,18 +28,12 @@ final class DanmakuRenderer: ObservableObject {
     private var danmakuView: DanmakuKitView?
     private var containerSize: CGSize = .zero
 
-    // 弹幕设置
     private var isEnabled: Bool = true
-    private var opacity: CGFloat = 0.8
-    private var speedMultiplier: CGFloat = 1.0
+    private var settings = DanmakuRenderSettings.current()
 
-    // 显示区域设置
-    private var displayAreaRatio: CGFloat = 0.5
-    private var displayAreaPosition: String = "top"
-    private var trackCount: Int = 4
-
-    /// 字体配置
     private let fontConfig = DanmakuFontConfiguration()
+    private var cachedFont: UIFont?
+    private var cachedFontSize: CGFloat = 0
 
     // MARK: - Initialization
 
@@ -48,15 +41,11 @@ final class DanmakuRenderer: ObservableObject {
         self.containerView = containerView
         self.containerSize = containerView.bounds.size
 
-        // 确保容器尺寸有效
         if containerSize.width <= 0 || containerSize.height <= 0 {
             logger.warning("Invalid container view size: \(containerSize), using default size")
-            self.containerSize = CGSize(width: 375, height: 667) // 默认iPhone尺寸
+            self.containerSize = CGSize(width: 375, height: 667)
         }
 
-        updateSettings()
-
-        // 延迟创建弹幕视图，确保所有参数都已设置
         DispatchQueue.main.async { [weak self] in
             self?.setupDanmakuView()
         }
@@ -79,47 +68,52 @@ final class DanmakuRenderer: ObservableObject {
         }
     }
 
-    func setOpacity(_ opacity: CGFloat) {
-        self.opacity = opacity
-        danmakuView?.alpha = opacity
-    }
+    func apply(settings: DanmakuRenderSettings) {
+        let areaChanged = self.settings.displayAreaRatio != settings.displayAreaRatio
+            || self.settings.displayAreaPosition != settings.displayAreaPosition
+            || self.settings.trackCount != settings.trackCount
 
-    func setSpeedMultiplier(_ multiplier: CGFloat) {
-        speedMultiplier = multiplier
-        // DanmakuKit 通过调整 displayTime 来控制速度
-    }
+        self.settings = settings
+        danmakuView?.alpha = settings.opacity
 
-    func setDisplayArea(ratio: CGFloat, position: String) {
-        displayAreaRatio = ratio
-        displayAreaPosition = position
-        updateDanmakuViewFrame()
-    }
+        if cachedFontSize != settings.fontSize {
+            cachedFontSize = settings.fontSize
+            cachedFont = fontConfig.getBestAvailableFont(size: settings.fontSize)
+        }
 
-    func updateSettings() {
-        trackCount = Defaults[.VideoPlayer.Overlay.danmakuTrackCount]
-        displayAreaRatio = CGFloat(Defaults[.VideoPlayer.Overlay.danmakuDisplayArea])
-        displayAreaPosition = Defaults[.VideoPlayer.Overlay.danmakuAreaPosition]
-
-        updateDanmakuViewFrame()
-
-        logger.debug("DanmakuKit settings updated: tracks=\(trackCount), ratio=\(displayAreaRatio), position=\(displayAreaPosition)")
+        if areaChanged {
+            updateDanmakuViewFrame()
+        }
     }
 
     func addDanmakuItems(_ items: [DanmakuItem]) {
         guard isEnabled, !items.isEmpty else { return }
 
-        DispatchQueue.main.async { [weak self] in
+        if Thread.isMainThread {
             for item in items {
-                self?.addDanmakuItem(item)
+                addDanmakuItem(item)
+            }
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                for item in items {
+                    self.addDanmakuItem(item)
+                }
             }
         }
     }
 
     func clearAllDanmaku() {
-        DispatchQueue.main.async { [weak self] in
+        let clear = { [weak self] in
             self?.danmakuView?.stop()
             self?.danmakuView?.play()
             self?.logger.debug("DanmakuKit cleared all danmaku")
+        }
+
+        if Thread.isMainThread {
+            clear()
+        } else {
+            DispatchQueue.main.async(execute: clear)
         }
     }
 
@@ -130,14 +124,12 @@ final class DanmakuRenderer: ObservableObject {
     // MARK: - Private Methods
 
     private func setupDanmakuView() {
-        guard let containerView = containerView else { return }
+        guard let containerView else { return }
 
-        // 创建 DanmakuKitView
         let danmakuView = DanmakuKitView()
         let frame = calculateDanmakuFrame()
         let trackHeight = calculateTrackHeight()
 
-        // 验证参数有效性
         guard frame.width > 0, frame.height > 0, trackHeight > 0 else {
             logger.warning("Invalid DanmakuKit parameters: frame=\(frame), trackHeight=\(trackHeight)")
             return
@@ -145,16 +137,15 @@ final class DanmakuRenderer: ObservableObject {
 
         danmakuView.frame = frame
         danmakuView.backgroundColor = .clear
-        danmakuView.alpha = opacity
-
-        // 配置弹幕视图
+        danmakuView.alpha = settings.opacity
         danmakuView.trackHeight = trackHeight
 
         containerView.addSubview(danmakuView)
         self.danmakuView = danmakuView
-
-        // 开始播放
         danmakuView.play()
+
+        cachedFont = fontConfig.getBestAvailableFont(size: settings.fontSize)
+        cachedFontSize = settings.fontSize
 
         logger.info("DanmakuKit view created: frame=\(frame), trackHeight=\(trackHeight)")
     }
@@ -163,7 +154,6 @@ final class DanmakuRenderer: ObservableObject {
         let frame = calculateDanmakuFrame()
         let trackHeight = calculateTrackHeight()
 
-        // 验证参数有效性
         guard frame.width > 0, frame.height > 0, trackHeight > 0 else {
             logger.warning("Invalid DanmakuKit update parameters: frame=\(frame), trackHeight=\(trackHeight)")
             return
@@ -171,21 +161,18 @@ final class DanmakuRenderer: ObservableObject {
 
         danmakuView?.frame = frame
         danmakuView?.trackHeight = trackHeight
-
-        logger.debug("DanmakuKit view updated: frame=\(frame), trackHeight=\(trackHeight)")
     }
 
     private func calculateDanmakuFrame() -> CGRect {
-        // 确保容器尺寸有效
         guard containerSize.width > 0, containerSize.height > 0 else {
             logger.warning("Invalid container size: \(containerSize)")
-            return CGRect(x: 0, y: 0, width: 100, height: 100) // 返回默认尺寸
+            return CGRect(x: 0, y: 0, width: 100, height: 100)
         }
 
-        let displayAreaHeight = containerSize.height * displayAreaRatio
+        let displayAreaHeight = containerSize.height * settings.displayAreaRatio
         let offsetY: CGFloat
 
-        switch displayAreaPosition {
+        switch settings.displayAreaPosition {
         case "top":
             offsetY = 0
         case "bottom":
@@ -203,7 +190,6 @@ final class DanmakuRenderer: ObservableObject {
             height: displayAreaHeight
         )
 
-        // 验证计算结果
         if frame.width <= 0 || frame.height <= 0 {
             logger.warning("Invalid calculated danmaku area: \(frame)")
             return CGRect(x: 0, y: 0, width: containerSize.width, height: containerSize.height)
@@ -213,59 +199,33 @@ final class DanmakuRenderer: ObservableObject {
     }
 
     private func calculateTrackHeight() -> CGFloat {
-        let displayAreaHeight = containerSize.height * displayAreaRatio
-        let trackHeight = displayAreaHeight / CGFloat(trackCount)
-
-        // 确保轨道高度有效，最小为20
+        let displayAreaHeight = containerSize.height * settings.displayAreaRatio
+        let trackHeight = displayAreaHeight / CGFloat(max(1, settings.trackCount))
         let validTrackHeight = max(20.0, trackHeight)
 
-        // 检查是否为有效数值
         if validTrackHeight.isNaN || validTrackHeight.isInfinite {
-            logger.warning("Invalid track height calculation: displayAreaHeight=\(displayAreaHeight), trackCount=\(trackCount)")
-            return 20.0 // 返回默认值
+            logger.warning("Invalid track height calculation: displayAreaHeight=\(displayAreaHeight), trackCount=\(settings.trackCount)")
+            return 20.0
         }
 
         return validTrackHeight
     }
 
     private func addDanmakuItem(_ item: DanmakuItem) {
-        guard isEnabled, let danmakuView = danmakuView else { return }
+        guard isEnabled, let danmakuView else { return }
 
-        // 创建弹幕模型
-        let cellModel = DanmakuTextCellModel(danmakuItem: item)
-
-        // 应用字体配置
-        let fontSize = fontConfig.adjustFontSize(
-            baseSize: CGFloat(Defaults[.VideoPlayer.Overlay.danmakuFontSize]),
-            content: item.content
-        )
-        cellModel.font = fontConfig.getBestAvailableFont(size: fontSize)
-
-        // 应用增强字体效果设置
-        let enhancedShadow = Defaults[.VideoPlayer.Overlay.danmakuEnhancedShadow]
-        if enhancedShadow {
-            let shadowConfig = fontConfig.getShadowConfiguration(enhanced: true)
-            cellModel.shadowOffset = shadowConfig.offset
-            cellModel.shadowBlurRadius = shadowConfig.radius
-            cellModel.shadowColor = UIColor(cgColor: shadowConfig.color).withAlphaComponent(CGFloat(shadowConfig.opacity))
-            cellModel.strokeWidth = 2.5 // 更粗的描边
+        let fontSize = fontConfig.adjustFontSize(baseSize: settings.fontSize, content: item.content)
+        let font: UIFont
+        if abs(fontSize - cachedFontSize) < 0.01, let cachedFont {
+            font = cachedFont
         } else {
-            let shadowConfig = fontConfig.getShadowConfiguration(enhanced: false)
-            cellModel.shadowOffset = shadowConfig.offset
-            cellModel.shadowBlurRadius = shadowConfig.radius
-            cellModel.shadowColor = UIColor(cgColor: shadowConfig.color).withAlphaComponent(CGFloat(shadowConfig.opacity))
-            cellModel.strokeWidth = 2.0 // 标准描边
+            font = fontConfig.getBestAvailableFont(size: fontSize)
         }
 
-        // 应用速度设置
-        cellModel.displayTime = 8.0 / Double(speedMultiplier)
-
-        // 重新计算尺寸
+        let cellModel = DanmakuTextCellModel(danmakuItem: item, settings: settings, font: font)
+        cellModel.displayTime = 8.0 / Double(max(0.1, settings.speedMultiplier))
         cellModel.calculateSize()
 
-        // 发射弹幕
         danmakuView.shoot(danmaku: cellModel)
-
-        logger.trace("DanmakuKit shot danmaku: '\(item.content)', type: \(cellModel.type), duration: \(cellModel.displayTime)s")
     }
 }
