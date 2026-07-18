@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -37,14 +37,14 @@ struct HourMinutePicker: UIViewRepresentable {
     }
 
     class Coordinator: TVOSPickerViewDelegate {
-        // callback to set the value to defaults
+        /// callback to set the value to defaults
         var callback: ((TimeInterval) -> Void)?
 
         // selected values
         private var selectedHour: TimeInterval = 0
         private var selectedMinute: TimeInterval = 0
 
-        // previousInterval helps set the default values of the picker
+        /// previousInterval helps set the default values of the picker
         private let previousInterval: TimeInterval
 
         init(previousInterval: TimeInterval) {

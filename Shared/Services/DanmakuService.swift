@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -14,7 +14,9 @@ import Logging
 // MARK: - Factory Registration
 
 extension Container {
-    var danmakuService: Factory<DanmakuService> { self { DanmakuService() }.singleton }
+    var danmakuService: Factory<DanmakuService> {
+        self { DanmakuService() }.singleton
+    }
 }
 
 // MARK: - DanmakuService
@@ -30,6 +32,7 @@ final class DanmakuService {
 
     private var baseURL: String {
         let configuredURL = Defaults[.VideoPlayer.Overlay.danmakuAPIBaseURL]
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         if configuredURL.isEmpty {
             return "http://192.168.50.112:8080/danmu/api/danmu" // 默认地址
         }
@@ -54,13 +57,30 @@ final class DanmakuService {
         seriesParams: SeriesDanmakuParams? = nil
     ) async throws -> [DanmakuItem] {
 
-        guard let encodedKeyword = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+        let trimmedKeyword = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPlatform = platform.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedKeyword.isEmpty else {
             throw DanmakuError.invalidKeyword
         }
+        guard !trimmedPlatform.isEmpty else {
+            throw DanmakuError.invalidURL
+        }
 
-        var urlComponents = URLComponents(string: "\(baseURL)/\(platform)/segment.json")!
+        guard var url = URL(string: baseURL) else {
+            logger.error("弹幕 API 地址无效: \(baseURL)")
+            throw DanmakuError.invalidURL
+        }
+        url.appendPathComponent(trimmedPlatform)
+        url.appendPathComponent("segment.json")
+
+        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            logger.error("弹幕 URL 构建失败: \(url.absoluteString)")
+            throw DanmakuError.invalidURL
+        }
+
         var queryItems = [
-            URLQueryItem(name: "keyword", value: keyword),
+            URLQueryItem(name: "keyword", value: trimmedKeyword),
             URLQueryItem(name: "start", value: "\(start)"),
             URLQueryItem(name: "end", value: "\(end)"),
         ]

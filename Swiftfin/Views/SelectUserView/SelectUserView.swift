@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -145,8 +145,8 @@ struct SelectUserView: View {
 
     // MARK: - Perform Device Authentication
 
-    // error logging/presentation is handled within here, just
-    // use try+thrown error in local Task for early return
+    /// error logging/presentation is handled within here, just
+    /// use try+thrown error in local Task for early return
     private func performDeviceAuthentication(reason: String) async throws {
         let context = LAContext()
         var policyError: NSError?
@@ -178,7 +178,6 @@ struct SelectUserView: View {
 
     // MARK: - Advanced Menu
 
-    @ViewBuilder
     private var advancedMenu: some View {
         Menu(L10n.advanced, systemImage: "gearshape.fill") {
 
@@ -235,7 +234,6 @@ struct SelectUserView: View {
         }
     }
 
-    @ViewBuilder
     private var addUserGridButtonView: some View {
         AddUserGridButton(
             selectedServer: selectedServer,
@@ -317,7 +315,6 @@ struct SelectUserView: View {
 
     // MARK: - List Content View
 
-    @ViewBuilder
     private var listContentView: some View {
         List {
             let userItems = self.userItems
@@ -372,7 +369,6 @@ struct SelectUserView: View {
 
     // MARK: - User View
 
-    @ViewBuilder
     private var contentView: some View {
         VStack(spacing: 0) {
             ZStack {
@@ -439,7 +435,6 @@ struct SelectUserView: View {
 
     // MARK: - Connect to Server View
 
-    @ViewBuilder
     private var connectToServerView: some View {
         VStack(spacing: 10) {
             L10n.connectToJellyfinServerStart.text

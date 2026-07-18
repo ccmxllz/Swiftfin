@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Foundation
@@ -42,8 +42,8 @@ extension Array {
         }
     }
 
-    // There are instances where `removeFirst()` is called on an empty
-    // collection even with a count check and causes a crash
+    /// There are instances where `removeFirst()` is called on an empty
+    /// collection even with a count check and causes a crash
     @discardableResult
     mutating func removeFirstSafe() -> Element? {
         guard count > 0 else { return nil }

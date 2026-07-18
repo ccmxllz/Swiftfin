@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -38,7 +38,6 @@ extension PagingLibraryView {
             }
         }
 
-        @ViewBuilder
         private func itemAccessoryView(item: BaseItemDto) -> some View {
             DotHStack {
                 if item.type == .episode, let seasonEpisodeLocator = item.seasonEpisodeLabel {
@@ -76,7 +75,6 @@ extension PagingLibraryView {
             }
         }
 
-        @ViewBuilder
         private var rowContent: some View {
             HStack {
                 VStack(alignment: .leading, spacing: 5) {
@@ -95,7 +93,6 @@ extension PagingLibraryView {
             }
         }
 
-        @ViewBuilder
         private var rowLeading: some View {
             ZStack {
                 Color.clear

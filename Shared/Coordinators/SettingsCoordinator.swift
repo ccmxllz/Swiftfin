@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -86,17 +86,14 @@ final class SettingsCoordinator: NavigationCoordinatable {
     #endif
 
     #if os(iOS)
-    @ViewBuilder
     func makeNativePlayerSettings() -> some View {
         NativeVideoPlayerSettingsView()
     }
 
-    @ViewBuilder
     func makePlaybackQualitySettings() -> some View {
         PlaybackQualitySettingsView()
     }
 
-    @ViewBuilder
     func makeCustomDeviceProfileSettings() -> some View {
         CustomDeviceProfileSettingsView()
     }
@@ -111,7 +108,6 @@ final class SettingsCoordinator: NavigationCoordinatable {
         NavigationViewCoordinator(EditCustomDeviceProfileCoordinator())
     }
 
-    @ViewBuilder
     func makeQuickConnectAuthorize(user: UserDto) -> some View {
         QuickConnectAuthorizeView(user: user)
     }
@@ -122,7 +118,6 @@ final class SettingsCoordinator: NavigationCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeLocalSecurity() -> some View {
         UserLocalSecurityView()
     }
@@ -131,33 +126,27 @@ final class SettingsCoordinator: NavigationCoordinatable {
         NavigationViewCoordinator(UserProfileImageCoordinator(viewModel: viewModel))
     }
 
-    @ViewBuilder
     func makeUserProfileSettings(viewModel: SettingsViewModel) -> some View {
         UserProfileSettingsView(viewModel: viewModel)
     }
 
-    @ViewBuilder
     func makeCustomizeViewsSettings() -> some View {
         CustomizeViewsSettings()
     }
 
-    @ViewBuilder
     func makeExperimentalSettings() -> some View {
         ExperimentalSettingsView()
     }
 
-    @ViewBuilder
     func makeIndicatorSettings() -> some View {
         IndicatorSettingsView()
     }
 
-    @ViewBuilder
     func makeItemViewAttributes(selection: Binding<[ItemViewAttribute]>) -> some View {
         OrderedSectionSelectorView(selection: selection, sources: ItemViewAttribute.allCases)
             .navigationTitle(L10n.mediaAttributes.localizedCapitalized)
     }
 
-    @ViewBuilder
     func makeServerConnection(server: ServerState) -> some View {
         EditServerView(server: server)
     }
@@ -177,13 +166,11 @@ final class SettingsCoordinator: NavigationCoordinatable {
         VideoPlayerSettingsCoordinator()
     }
 
-    @ViewBuilder
     func makeAdminDashboard() -> some View {
         AdminDashboardCoordinator().view()
     }
 
     #if DEBUG
-    @ViewBuilder
     func makeDebugSettings() -> some View {
         DebugSettingsView()
     }
@@ -251,12 +238,10 @@ final class SettingsCoordinator: NavigationCoordinatable {
     }
     #endif
 
-    @ViewBuilder
     func makeLog() -> some View {
         ConsoleView()
     }
 
-    @ViewBuilder
     func makeStart() -> some View {
         SettingsView()
     }

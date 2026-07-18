@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import CollectionVGrid
@@ -103,7 +103,6 @@ struct ServerActivityView: View {
 
     // MARK: - User Filter Button
 
-    @ViewBuilder
     private var userFilterButton: some View {
         Menu(
             L10n.type,
@@ -136,7 +135,6 @@ struct ServerActivityView: View {
 
     // MARK: - Start Date Button
 
-    @ViewBuilder
     private var startDateButton: some View {
         Button(L10n.startDate, systemImage: "calendar") {
             if let minDate = viewModel.minDate {
@@ -150,7 +148,6 @@ struct ServerActivityView: View {
 
     // MARK: - Start Date Picker Sheet
 
-    @ViewBuilder
     private var startDatePickerSheet: some View {
         NavigationView {
             List {
@@ -165,7 +162,7 @@ struct ServerActivityView: View {
                     .labelsHidden()
                 }
 
-                /// Reset button to remove the filter
+                // Reset button to remove the filter
                 if viewModel.minDate != nil {
                     Section {
                         ListRowButton(L10n.reset, role: .destructive) {

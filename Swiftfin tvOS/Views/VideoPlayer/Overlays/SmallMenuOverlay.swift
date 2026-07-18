@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
@@ -43,7 +43,6 @@ extension VideoPlayer {
         @StateObject
         private var focusGuide: FocusGuide = .init()
 
-        @ViewBuilder
         private var subtitleMenu: some View {
             HStack {
                 ForEach(viewModel.subtitleStreams, id: \.self) { mediaStream in
@@ -61,7 +60,6 @@ extension VideoPlayer {
             .modifier(MenuStyle(focusGuide: focusGuide))
         }
 
-        @ViewBuilder
         private var audioMenu: some View {
             HStack {
                 ForEach(viewModel.audioStreams, id: \.self) { mediaStream in
@@ -79,7 +77,6 @@ extension VideoPlayer {
             .modifier(MenuStyle(focusGuide: focusGuide))
         }
 
-        @ViewBuilder
         private var playbackSpeedMenu: some View {
             HStack {
                 ForEach(PlaybackSpeed.allCases, id: \.self) { speed in

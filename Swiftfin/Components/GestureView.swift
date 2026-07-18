@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -13,13 +13,13 @@ import SwiftUI
 // TODO: change swipe to directional
 // TODO: figure out way for multitap near the middle be distinguished as different sides
 
-// state, point, velocity, translation
+/// state, point, velocity, translation
 typealias PanGestureHandler = (UIGestureRecognizer.State, UnitPoint, CGFloat, CGFloat) -> Void
-// state, point, scale
+/// state, point, scale
 typealias PinchGestureHandler = (UIGestureRecognizer.State, UnitPoint, CGFloat) -> Void
-// point, direction, amount
+/// point, direction, amount
 typealias SwipeGestureHandler = (UnitPoint, Bool, Int) -> Void
-// point, amount
+/// point, amount
 typealias TapGestureHandler = (UnitPoint, Int) -> Void
 
 struct GestureView: UIViewRepresentable {

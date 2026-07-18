@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -339,7 +339,7 @@ final class UserSignInViewModel: ViewModel, Eventful, Stateful {
         return isEnabled ?? false
     }
 
-    // server has same id, but new access token
+    /// server has same id, but new access token
     private func setNewAccessToken(user: UserState) {
         do {
             guard let existingUser = try dataStack.fetchOne(From<UserModel>().where(\.$id == user.id)) else { return }

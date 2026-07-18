@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Foundation
@@ -39,7 +39,6 @@ final class MainTabCoordinator: TabCoordinatable {
         NavigationViewCoordinator(HomeCoordinator())
     }
 
-    @ViewBuilder
     func makeHomeTab(isActive: Bool) -> some View {
         HStack {
             Image(systemName: "house")
@@ -54,7 +53,6 @@ final class MainTabCoordinator: TabCoordinatable {
         return NavigationViewCoordinator(LibraryCoordinator(viewModel: viewModel))
     }
 
-    @ViewBuilder
     func makeTvTab(isActive: Bool) -> some View {
         HStack {
             Image(systemName: "tv")
@@ -70,7 +68,6 @@ final class MainTabCoordinator: TabCoordinatable {
         return NavigationViewCoordinator(LibraryCoordinator(viewModel: viewModel))
     }
 
-    @ViewBuilder
     func makeMoviesTab(isActive: Bool) -> some View {
         HStack {
             Image(systemName: "film")
@@ -86,7 +83,6 @@ final class MainTabCoordinator: TabCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeSearchTab(isActive: Bool) -> some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -98,7 +94,6 @@ final class MainTabCoordinator: TabCoordinatable {
         NavigationViewCoordinator(MediaCoordinator())
     }
 
-    @ViewBuilder
     func makeMediaTab(isActive: Bool) -> some View {
         HStack {
             Image(systemName: "rectangle.stack")
@@ -110,7 +105,6 @@ final class MainTabCoordinator: TabCoordinatable {
         NavigationViewCoordinator(SettingsCoordinator())
     }
 
-    @ViewBuilder
     func makeSettingsTab(isActive: Bool) -> some View {
         Image(systemName: "gearshape.fill")
             .accessibilityLabel(L10n.settings)

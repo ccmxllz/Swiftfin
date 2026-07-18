@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
@@ -60,7 +60,7 @@ struct ListRowMenu<Content: View, Subtitle: View>: View {
 
 // MARK: - Initializers
 
-// Base initializer
+/// Base initializer
 extension ListRowMenu where Subtitle == Text? {
 
     init(_ title: Text, @ViewBuilder content: @escaping () -> Content) {
@@ -100,7 +100,7 @@ extension ListRowMenu where Subtitle == Text? {
     }
 }
 
-// Custom view subtitles
+/// Custom view subtitles
 extension ListRowMenu {
 
     init(_ title: String, @ViewBuilder subtitle: @escaping () -> Subtitle, @ViewBuilder content: @escaping () -> Content) {
@@ -116,7 +116,7 @@ extension ListRowMenu {
     }
 }
 
-// Initialize from a CaseIterable Enum
+/// Initialize from a CaseIterable Enum
 extension ListRowMenu where Subtitle == Text, Content == AnyView {
 
     init<ItemType>(

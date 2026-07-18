@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -67,7 +67,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Item Metadata
 
-    @ViewBuilder
     func makeIdentifyItem(item: BaseItemDto) -> some View {
         IdentifyItemView(item: item)
     }
@@ -86,7 +85,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Item Genres
 
-    @ViewBuilder
     func makeEditGenres(item: BaseItemDto) -> some View {
         EditItemElementView<String>(
             viewModel: GenreEditorViewModel(item: item),
@@ -105,7 +103,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Item Tags
 
-    @ViewBuilder
     func makeEditTags(item: BaseItemDto) -> some View {
         EditItemElementView<String>(
             viewModel: TagEditorViewModel(item: item),
@@ -124,7 +121,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Item Studios
 
-    @ViewBuilder
     func makeEditStudios(item: BaseItemDto) -> some View {
         EditItemElementView<NameGuidPair>(
             viewModel: StudioEditorViewModel(item: item),
@@ -143,7 +139,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Item People
 
-    @ViewBuilder
     func makeEditPeople(item: BaseItemDto) -> some View {
         EditItemElementView<BaseItemPerson>(
             viewModel: PeopleEditorViewModel(item: item),
@@ -162,7 +157,6 @@ final class ItemEditorCoordinator: ObservableObject, NavigationCoordinatable {
 
     // MARK: - Start
 
-    @ViewBuilder
     func makeStart() -> some View {
         ItemEditorView(viewModel: viewModel)
     }

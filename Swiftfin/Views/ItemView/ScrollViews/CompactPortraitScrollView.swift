@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import BlurHashKit
@@ -41,7 +41,6 @@ extension ItemView {
             self.viewModel = viewModel
         }
 
-        @ViewBuilder
         private var headerView: some View {
             ImageView(viewModel.item.imageSource(.backdrop, maxWidth: UIScreen.main.bounds.width))
                 .aspectRatio(1.77, contentMode: .fill)
@@ -102,7 +101,6 @@ extension ItemView.CompactPosterScrollView {
         @ObservedObject
         var viewModel: ItemViewModel
 
-        @ViewBuilder
         private var rightShelfView: some View {
             VStack(alignment: .leading) {
 

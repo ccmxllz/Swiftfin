@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import CollectionHStack
@@ -69,24 +69,24 @@ extension SeriesEpisodeSelector {
             switch viewModel.state {
             case .content:
                 if viewModel.elements.isEmpty {
-                    /// Focus the EmptyCard if the Season has no elements
+                    // Focus the EmptyCard if the Season has no elements
                     focusedEpisodeID = "emptyCard"
                 } else {
                     if let lastFocusedEpisodeID,
                        viewModel.elements.contains(where: { $0.id == lastFocusedEpisodeID })
                     {
-                        /// Return focus to the Last Focused Episode if it exists in the current Season
+                        // Return focus to the Last Focused Episode if it exists in the current Season
                         focusedEpisodeID = lastFocusedEpisodeID
                     } else {
-                        /// Focus the First Episode in the season as a last resort
+                        // Focus the First Episode in the season as a last resort
                         focusedEpisodeID = viewModel.elements.first?.id
                     }
                 }
             case .error:
-                /// Focus the ErrorCard if the Season failed to load
+                // Focus the ErrorCard if the Season failed to load
                 focusedEpisodeID = "errorCard"
             case .initial, .refreshing:
-                /// Focus the LoadingCard if the Season is currently loading
+                // Focus the LoadingCard if the Season is currently loading
                 focusedEpisodeID = "loadingCard"
             }
         }

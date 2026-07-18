@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Foundation
@@ -28,7 +28,6 @@ final class LiveTVCoordinator: TabCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeProgramsTab(isActive: Bool) -> some View {
         Label(L10n.programs, systemImage: "tv")
     }
@@ -39,7 +38,6 @@ final class LiveTVCoordinator: TabCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeChannelsTab(isActive: Bool) -> some View {
         Label(L10n.channels, systemImage: "play.square.stack")
     }

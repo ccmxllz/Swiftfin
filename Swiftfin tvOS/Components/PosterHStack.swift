@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import CollectionHStack
@@ -23,7 +23,7 @@ struct PosterHStack<Element: Poster & Identifiable, Data: Collection>: View wher
     private var trailingContent: () -> any View
     private var onSelect: (Element) -> Void
 
-    // See PosterButton for implementation reason
+    /// See PosterButton for implementation reason
     private var focusedItem: Binding<Element?>?
 
     var body: some View {
@@ -52,7 +52,9 @@ struct PosterHStack<Element: Poster & Identifiable, Data: Collection>: View wher
                     .onSelect { onSelect(item) }
                     .ifLet(focusedItem) { view, focusedItem in
                         view.onFocusChanged { isFocused in
-                            if isFocused { focusedItem.wrappedValue = item }
+                            if isFocused {
+                                focusedItem.wrappedValue = item
+                            }
                         }
                     }
             }

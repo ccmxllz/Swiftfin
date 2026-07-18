@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -44,18 +44,18 @@ extension CustomizeViewsSettings {
                     selection: $enabledTrailers
                 )
 
-                /// Enabled Collection Management for collection managers
+                // Enabled Collection Management for collection managers
                 if userSession?.user.permissions.items.canManageCollections == true {
                     Toggle(L10n.editCollections, isOn: $enableCollectionManagement)
                 }
-                /// Enabled Media Management when there are media elements that can be managed
+                // Enabled Media Management when there are media elements that can be managed
                 if userSession?.user.permissions.items.canEditMetadata == true ||
                     userSession?.user.permissions.items.canManageLyrics == true ||
                     userSession?.user.permissions.items.canManageSubtitles == true
                 {
                     Toggle(L10n.editMedia, isOn: $enableItemEditing)
                 }
-                /// Enabled Media Deletion for valid deletion users
+                // Enabled Media Deletion for valid deletion users
                 if userSession?.user.permissions.items.canDelete == true {
                     Toggle(L10n.deleteMedia, isOn: $enableItemDeletion)
                 }

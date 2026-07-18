@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 // Modification of https://github.com/zattoo/TvOSSlider
@@ -96,7 +96,7 @@ final class UITVOSSlider: UIControl {
     /// Damping value for panning gestures
     var panDampingValue: Float = 5
 
-    // Size for thumb view
+    /// Size for thumb view
     var thumbSize: CGFloat = 30
 
     var fineTunningVelocityThreshold: Float = 600

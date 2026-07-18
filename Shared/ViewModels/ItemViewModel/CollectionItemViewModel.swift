@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -49,13 +49,11 @@ final class CollectionItemViewModel: ItemViewModel {
 
         let items = response.value.items ?? []
 
-        let result = OrderedDictionary<BaseItemKind?, [BaseItemDto]>(
+        return OrderedDictionary<BaseItemKind?, [BaseItemDto]>(
             grouping: items,
             by: \.type
         )
         .compactKeys()
         .sortedKeys { $0.rawValue < $1.rawValue }
-
-        return result
     }
 }

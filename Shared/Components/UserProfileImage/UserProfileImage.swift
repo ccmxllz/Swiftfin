@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Nuke
@@ -30,7 +30,7 @@ struct UserProfileImage<Placeholder: View>: View {
     // MARK: - Overlay Opacity
 
     private var overlayOpacity: Double {
-        /// Dim the Profile Image if Editing & Unselected or if Disabled
+        // Dim the Profile Image if Editing & Unselected or if Disabled
         if (isEditing && !isSelected) || !isEnabled {
             return 0.5
         } else {

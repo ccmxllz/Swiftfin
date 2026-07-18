@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import CollectionVGrid
@@ -180,7 +180,6 @@ struct PagingLibraryView<Element: Poster>: View {
     // Note: if parent is a folders then other items will have labels,
     //       so an empty content view is necessary
 
-    @ViewBuilder
     private func landscapeGridItemView(item: Element) -> some View {
         PosterButton(item: item, type: .landscape)
             .content {
@@ -200,7 +199,6 @@ struct PagingLibraryView<Element: Poster>: View {
             }
     }
 
-    @ViewBuilder
     private func portraitGridItemView(item: Element) -> some View {
         PosterButton(item: item, type: .portrait)
             .content {
@@ -220,7 +218,6 @@ struct PagingLibraryView<Element: Poster>: View {
             }
     }
 
-    @ViewBuilder
     private func listItemView(item: Element, posterType: PosterDisplayType) -> some View {
         LibraryRow(item: item, posterType: posterType)
             .onSelect {
@@ -228,7 +225,6 @@ struct PagingLibraryView<Element: Poster>: View {
             }
     }
 
-    @ViewBuilder
     private func errorView(with error: some Error) -> some View {
         ErrorView(error: error)
             .onRetry {
@@ -236,7 +232,6 @@ struct PagingLibraryView<Element: Poster>: View {
             }
     }
 
-    @ViewBuilder
     private var gridView: some View {
         CollectionVGrid(
             uniqueElements: viewModel.elements,

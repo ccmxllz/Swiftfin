@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -95,36 +95,30 @@ final class AdminDashboardCoordinator: NavigationCoordinatable {
 
     // MARK: - Views: User Activity
 
-    @ViewBuilder
     func makeActivityLogs() -> some View {
         ServerActivityView()
     }
 
-    @ViewBuilder
     func makeActivityDetails(viewModel: ServerActivityDetailViewModel) -> some View {
         ServerActivityDetailsView(viewModel: viewModel)
     }
 
     // MARK: - Views: Active Sessions
 
-    @ViewBuilder
     func makeActiveSessions() -> some View {
         ActiveSessionsView()
     }
 
-    @ViewBuilder
     func makeActiveDeviceDetails(box: BindingBox<SessionInfoDto?>) -> some View {
         ActiveSessionDetailView(box: box)
     }
 
     // MARK: - Views: Server Tasks
 
-    @ViewBuilder
     func makeTasks() -> some View {
         ServerTasksView()
     }
 
-    @ViewBuilder
     func makeEditServerTask(observer: ServerTaskObserver) -> some View {
         EditServerTaskView(observer: observer)
     }
@@ -137,31 +131,26 @@ final class AdminDashboardCoordinator: NavigationCoordinatable {
 
     // MARK: - Views: Devices
 
-    @ViewBuilder
     func makeDevices() -> some View {
         DevicesView()
     }
 
-    @ViewBuilder
     func makeDeviceDetails(device: DeviceInfoDto) -> some View {
         DeviceDetailsView(device: device)
     }
 
     // MARK: - Views: Server Logs
 
-    @ViewBuilder
     func makeServerLogs() -> some View {
         ServerLogsView()
     }
 
     // MARK: - Views: Users
 
-    @ViewBuilder
     func makeUsers() -> some View {
         ServerUsersView()
     }
 
-    @ViewBuilder
     func makeUserDetails(user: UserDto) -> some View {
         ServerUserDetailsView(user: user)
     }
@@ -202,12 +191,10 @@ final class AdminDashboardCoordinator: NavigationCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeUserEditAccessSchedules(viewModel: ServerUserAdminViewModel) -> some View {
         EditAccessScheduleView(viewModel: viewModel)
     }
 
-    @ViewBuilder
     func makeUserEditAccessTags(viewModel: ServerUserAdminViewModel) -> some View {
         EditServerUserAccessTagsView(viewModel: viewModel)
     }
@@ -236,21 +223,18 @@ final class AdminDashboardCoordinator: NavigationCoordinatable {
         }
     }
 
-    @ViewBuilder
     func makeQuickConnectAuthorize(user: UserDto) -> some View {
         QuickConnectAuthorizeView(user: user)
     }
 
     // MARK: - Views: API Keys
 
-    @ViewBuilder
     func makeAPIKeys() -> some View {
         APIKeysView()
     }
 
     // MARK: - Views: Dashboard
 
-    @ViewBuilder
     func makeStart() -> some View {
         AdminDashboardView()
     }

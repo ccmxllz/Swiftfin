@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -48,7 +48,6 @@ extension EditMetadataView {
 
         // MARK: - Series Status View
 
-        @ViewBuilder
         private var seriesStatusView: some View {
             Picker(
                 L10n.status,
@@ -67,7 +66,6 @@ extension EditMetadataView {
 
         // MARK: - Air Time View
 
-        @ViewBuilder
         private var airTimeView: some View {
             DatePicker(
                 L10n.airTime,
@@ -83,7 +81,6 @@ extension EditMetadataView {
 
         // MARK: - Air Days View
 
-        @ViewBuilder
         private var airDaysView: some View {
             ForEach(DayOfWeek.allCases, id: \.self) { field in
                 Toggle(
@@ -97,7 +94,6 @@ extension EditMetadataView {
 
         // MARK: - Run Time View
 
-        @ViewBuilder
         private var runTimeView: some View {
             ChevronButton(
                 L10n.runtime,

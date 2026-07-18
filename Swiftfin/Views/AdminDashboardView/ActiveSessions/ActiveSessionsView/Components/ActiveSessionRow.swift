@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -31,7 +31,6 @@ extension ActiveSessionsView {
             self.onSelect = action
         }
 
-        @ViewBuilder
         private var rowLeading: some View {
             // TODO: better handling for different poster types
             Group {
@@ -77,7 +76,6 @@ extension ActiveSessionsView {
             .padding(.vertical, 8)
         }
 
-        @ViewBuilder
         private func activeSessionDetails(_ nowPlayingItem: BaseItemDto, playState: PlayerStateInfo) -> some View {
             VStack(alignment: .leading) {
                 Text(session.userName ?? L10n.unknown)
@@ -94,7 +92,6 @@ extension ActiveSessionsView {
             .font(.subheadline)
         }
 
-        @ViewBuilder
         private var idleSessionDetails: some View {
             VStack(alignment: .leading) {
 

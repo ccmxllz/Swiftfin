@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
@@ -22,7 +22,9 @@ struct HourMinuteFormatStyle: FormatStyle {
 
 extension FormatStyle where Self == HourMinuteFormatStyle {
 
-    static var hourMinute: HourMinuteFormatStyle { HourMinuteFormatStyle() }
+    static var hourMinute: HourMinuteFormatStyle {
+        HourMinuteFormatStyle()
+    }
 }
 
 struct RunTimeFormatStyle: FormatStyle {
@@ -52,7 +54,9 @@ struct RunTimeFormatStyle: FormatStyle {
 
 extension FormatStyle where Self == RunTimeFormatStyle {
 
-    static var runtime: RunTimeFormatStyle { RunTimeFormatStyle() }
+    static var runtime: RunTimeFormatStyle {
+        RunTimeFormatStyle()
+    }
 }
 
 /// Represent intervals as 24 hour, 60 minute, 60 second days
@@ -152,7 +156,9 @@ struct LastSeenFormatStyle: FormatStyle {
 
 extension FormatStyle where Self == LastSeenFormatStyle {
 
-    static var lastSeen: LastSeenFormatStyle { LastSeenFormatStyle() }
+    static var lastSeen: LastSeenFormatStyle {
+        LastSeenFormatStyle()
+    }
 }
 
 struct IntBitRateFormatStyle: FormatStyle {
@@ -178,5 +184,7 @@ struct IntBitRateFormatStyle: FormatStyle {
 }
 
 extension FormatStyle where Self == IntBitRateFormatStyle {
-    static var bitRate: IntBitRateFormatStyle { IntBitRateFormatStyle() }
+    static var bitRate: IntBitRateFormatStyle {
+        IntBitRateFormatStyle()
+    }
 }

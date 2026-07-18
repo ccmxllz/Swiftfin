@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -28,7 +28,7 @@ final class UserLocalSecurityViewModel: ViewModel, Eventful {
 
     private var eventSubject: PassthroughSubject<Event, Never> = .init()
 
-    // Will throw and send event if needing to prompt for old auth.
+    /// Will throw and send event if needing to prompt for old auth.
     func checkForOldPolicy() throws {
 
         let oldPolicy = userSession.user.accessPolicy
@@ -46,7 +46,7 @@ final class UserLocalSecurityViewModel: ViewModel, Eventful {
         }
     }
 
-    // Will throw and send event if needing to prompt for new auth.
+    /// Will throw and send event if needing to prompt for new auth.
     func checkFor(newPolicy: UserAccessPolicy) throws {
         switch newPolicy {
         case .requireDeviceAuthentication:

@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -170,8 +170,8 @@ struct UserSignInView: View {
 
     // MARK: - Perform Device Authentication
 
-    // error logging/presentation is handled within here, just
-    // use try+thrown error in local Task for early return
+    /// error logging/presentation is handled within here, just
+    /// use try+thrown error in local Task for early return
     private func performDeviceAuthentication(reason: String) async throws {
         let context = LAContext()
         var policyError: NSError?
@@ -279,7 +279,6 @@ struct UserSignInView: View {
 
     // MARK: - Public Users Section
 
-    @ViewBuilder
     private var publicUsersSection: some View {
         Section(L10n.publicUsers) {
             if viewModel.publicUsers.isEmpty {

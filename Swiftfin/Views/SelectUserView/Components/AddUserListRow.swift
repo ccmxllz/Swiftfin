@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import OrderedCollections
@@ -22,7 +22,6 @@ extension SelectUserView {
         let servers: OrderedSet<ServerState>
         let action: (ServerState) -> Void
 
-        @ViewBuilder
         private var rowContent: some View {
             Text(L10n.addUser)
                 .font(.title3)
@@ -33,7 +32,6 @@ extension SelectUserView {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
 
-        @ViewBuilder
         private var rowLeading: some View {
             ZStack {
                 Group {
@@ -54,7 +52,6 @@ extension SelectUserView {
             .padding(.vertical, 8)
         }
 
-        @ViewBuilder
         private var label: some View {
             ListRow(insets: .init(horizontal: EdgeInsets.edgePadding)) {
                 rowLeading

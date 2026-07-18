@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Combine
@@ -50,7 +50,7 @@ final class ConnectToServerViewModel: ViewModel, Eventful, Stateful {
     @Published
     var backgroundStates: Set<BackgroundState> = []
 
-    // no longer-found servers are not cleared, but not an issue
+    /// no longer-found servers are not cleared, but not an issue
     @Published
     var localServers: OrderedSet<ServerState> = []
     @Published
@@ -62,7 +62,7 @@ final class ConnectToServerViewModel: ViewModel, Eventful, Stateful {
             .eraseToAnyPublisher()
     }
 
-    private var connectTask: AnyCancellable? = nil
+    private var connectTask: AnyCancellable?
     private let discovery = ServerDiscovery()
     private var eventSubject: PassthroughSubject<Event, Never> = .init()
 
@@ -165,18 +165,16 @@ final class ConnectToServerViewModel: ViewModel, Eventful, Stateful {
             response: response.response.url
         )
 
-        let newServerState = ServerState(
+        return ServerState(
             urls: [connectionURL],
             currentURL: connectionURL,
             name: name,
             id: id,
             usersIDs: []
         )
-
-        return newServerState
     }
 
-    // In the event of redirects, get the new host URL from response
+    /// In the event of redirects, get the new host URL from response
     private func processConnectionURL(initial url: URL, response: URL?) -> URL {
 
         guard let response else { return url }
@@ -217,7 +215,7 @@ final class ConnectToServerViewModel: ViewModel, Eventful, Stateful {
         StoredValues[.Server.publicInfo(id: server.id)] = publicInfo
     }
 
-    // server has same id, but (possible) new URL
+    /// server has same id, but (possible) new URL
     private func addNewURL(server: ServerState) {
         do {
             let newState = try dataStack.perform { transaction in

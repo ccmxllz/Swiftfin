@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Stinsen
@@ -31,25 +31,21 @@ final class EditCustomDeviceProfileCoordinator: NavigationCoordinatable {
         self.profile = profile
     }
 
-    @ViewBuilder
     func makeCustomDeviceAudioEditor(selection: Binding<[AudioCodec]>) -> some View {
         OrderedSectionSelectorView(selection: selection, sources: AudioCodec.allCases)
             .navigationTitle(L10n.audio)
     }
 
-    @ViewBuilder
     func makeCustomDeviceVideoEditor(selection: Binding<[VideoCodec]>) -> some View {
         OrderedSectionSelectorView(selection: selection, sources: VideoCodec.allCases)
             .navigationTitle(L10n.video)
     }
 
-    @ViewBuilder
     func makeCustomDeviceContainerEditor(selection: Binding<[MediaContainer]>) -> some View {
         OrderedSectionSelectorView(selection: selection, sources: MediaContainer.allCases)
             .navigationTitle(L10n.containers)
     }
 
-    @ViewBuilder
     func makeStart() -> some View {
         CustomDeviceProfileSettingsView.EditCustomDeviceProfileView(profile: profile)
             .navigationTitle(L10n.customProfile)

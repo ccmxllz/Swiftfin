@@ -3,25 +3,25 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Foundation
 
-// Path to the English localization file
+/// Path to the English localization file
 let localizationFile = "./Translations/en.lproj/Localizable.strings"
 
-// Directories to scan for Swift files
+/// Directories to scan for Swift files
 let directoriesToScan = ["./Shared", "./Swiftfin", "./Swiftfin tvOS"]
 
-// File to exclude from scanning
+/// File to exclude from scanning
 let excludedFile = "./Shared/Strings/Strings.swift"
 
-// Regular expressions to match localization entries and usage in Swift files
-// Matches lines like "Key" = "Value";
+/// Regular expressions to match localization entries and usage in Swift files
+/// Matches lines like "Key" = "Value";
 let localizationRegex = #/^\"(?<key>[^\"]+)\"\s*=\s*\"(?<value>[^\"]+)\";$/#
 
-// Matches usage like L10n.key in Swift files
+/// Matches usage like L10n.key in Swift files
 let usageRegex = #/L10n\.(?<key>[a-zA-Z0-9_]+)/#
 
 // Attempt to load the localization file's content
@@ -39,7 +39,9 @@ for line in localizationLines {
     let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
 
     // Skip empty lines or comments
-    if trimmed.isEmpty || trimmed.hasPrefix("//") { continue }
+    if trimmed.isEmpty || trimmed.hasPrefix("//") {
+        continue
+    }
 
     // Match valid localization entries and add them to the dictionary
     if let match = line.firstMatch(of: localizationRegex) {
@@ -49,10 +51,10 @@ for line in localizationLines {
     }
 }
 
-// Set to store all keys found in the codebase
+/// Set to store all keys found in the codebase
 var usedKeys = Set<String>()
 
-// Function to scan a directory recursively for Swift files
+/// Function to scan a directory recursively for Swift files
 func scanDirectory(_ path: String) {
     let fileManager = FileManager.default
     guard let enumerator = fileManager.enumerator(atPath: path) else { return }
@@ -61,7 +63,9 @@ func scanDirectory(_ path: String) {
         let filePath = "\(path)/\(file)"
 
         // Skip the excluded file
-        if filePath == excludedFile { continue }
+        if filePath == excludedFile {
+            continue
+        }
 
         // Process only Swift files
         if file.hasSuffix(".swift") {
@@ -86,7 +90,7 @@ for directory in directoriesToScan {
 
 // MARK: - Remove Unused Keys
 
-// Identify keys in the localization file that are not used in the codebase
+/// Identify keys in the localization file that are not used in the codebase
 let unusedKeys = localizationEntries.keys.filter { !usedKeys.contains($0) }
 
 // Remove unused keys from the dictionary
@@ -94,10 +98,10 @@ unusedKeys.forEach { localizationEntries.removeValue(forKey: $0) }
 
 // MARK: - Write Updated Localizable.strings
 
-// Sort keys alphabetically for consistent formatting
+/// Sort keys alphabetically for consistent formatting
 let sortedKeys = localizationEntries.keys.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
 
-// Reconstruct the localization file with sorted and updated entries
+/// Reconstruct the localization file with sorted and updated entries
 let updatedContent = sortedKeys.map { "/// \(localizationEntries[$0]!)\n\"\($0)\" = \"\(localizationEntries[$0]!)\";" }
     .joined(separator: "\n\n")
 

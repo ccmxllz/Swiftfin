@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Factory
@@ -63,7 +63,7 @@ struct ItemEditorView: View {
                 description: viewModel.item.path
             )
 
-            /// Hide metadata options to Lyric/Subtitle only users
+            // Hide metadata options to Lyric/Subtitle only users
             if canEditMetadata {
 
                 refreshButtonView
@@ -86,7 +86,6 @@ struct ItemEditorView: View {
 
     // MARK: - ErrorView
 
-    @ViewBuilder
     private func errorView(with error: some Error) -> some View {
         ErrorView(error: error)
             .onRetry {
@@ -96,7 +95,6 @@ struct ItemEditorView: View {
 
     // MARK: - Refresh Menu Button
 
-    @ViewBuilder
     private var refreshButtonView: some View {
         Section {
             RefreshMetadataButton(item: viewModel.item)
@@ -160,7 +158,6 @@ struct ItemEditorView: View {
 
     // MARK: - Editable Metadata Components Routing Buttons
 
-    @ViewBuilder
     private var editComponentsView: some View {
         Section {
             ChevronButton(L10n.genres) {

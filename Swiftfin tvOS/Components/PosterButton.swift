@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -25,8 +25,8 @@ struct PosterButton<Item: Poster>: View {
     private var contextMenu: () -> any View
     private var onSelect: () -> Void
 
-    // Setting the .focused() modifier causes significant performance issues.
-    // Only set if desiring focus changes
+    /// Setting the .focused() modifier causes significant performance issues.
+    /// Only set if desiring focus changes
     private var onFocusChanged: ((Bool) -> Void)?
 
     private func imageView(from item: Item) -> ImageView {
@@ -180,7 +180,7 @@ extension PosterButton {
 
     // TODO: clean up
 
-    // Content specific for BaseItemDto episode items
+    /// Content specific for BaseItemDto episode items
     struct EpisodeContentSubtitleContent: View {
 
         let item: Item

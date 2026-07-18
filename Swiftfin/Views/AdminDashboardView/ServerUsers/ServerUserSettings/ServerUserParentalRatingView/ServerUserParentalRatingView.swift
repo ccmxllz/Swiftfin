@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -83,7 +83,6 @@ struct ServerUserParentalRatingView: View {
 
     // MARK: - Content View
 
-    @ViewBuilder
     var contentView: some View {
         List {
             maxParentalRatingsView
@@ -93,7 +92,6 @@ struct ServerUserParentalRatingView: View {
 
     // MARK: - Maximum Parental Ratings View
 
-    @ViewBuilder
     var maxParentalRatingsView: some View {
         Section {
             Picker(L10n.parentalRating, selection: $tempPolicy.maxParentalRating) {
@@ -117,7 +115,6 @@ struct ServerUserParentalRatingView: View {
 
     // MARK: - Block Unrated Items View
 
-    @ViewBuilder
     var blockUnratedItemsView: some View {
         Section {
             ForEach(UnratedItem.allCases.sorted(using: \.displayTitle), id: \.self) { item in
@@ -179,7 +176,7 @@ struct ServerUserParentalRatingView: View {
         }
         .sorted(using: \.key)
 
-        let groupedRatings = groups.compactMap { key, group in
+        return groups.compactMap { key, group in
             let matchingRating = parentalRatingGroups.first { $0.value == key }
 
             let name = group
@@ -192,7 +189,5 @@ struct ServerUserParentalRatingView: View {
                 subtitle: name
             )
         }
-
-        return groupedRatings
     }
 }

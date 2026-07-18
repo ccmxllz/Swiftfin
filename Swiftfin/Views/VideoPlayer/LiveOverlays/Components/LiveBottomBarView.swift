@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -53,7 +53,6 @@ extension LiveVideoPlayer.Overlay {
         @State
         private var currentChapter: ChapterInfo.FullInfo?
 
-        @ViewBuilder
         private var capsuleSlider: some View {
             CapsuleSlider(progress: $currentProgressHandler.scrubbedProgress)
                 .isEditing(_isScrubbing.wrappedValue)
@@ -86,7 +85,6 @@ extension LiveVideoPlayer.Overlay {
                 .frame(height: 50)
         }
 
-        @ViewBuilder
         private var thumbSlider: some View {
             ThumbSlider(progress: $currentProgressHandler.scrubbedProgress)
                 .isEditing(_isScrubbing.wrappedValue)

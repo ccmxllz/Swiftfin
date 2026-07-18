@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -22,7 +22,6 @@ extension VideoPlayer.Overlay {
         @EnvironmentObject
         private var viewModel: VideoPlayerViewModel
 
-        @ViewBuilder
         private var advancedButton: some View {
             ActionButtons.Advanced {
                 Image(systemName: "gearshape.fill")
@@ -31,7 +30,6 @@ extension VideoPlayer.Overlay {
             }
         }
 
-        @ViewBuilder
         private var aspectFillButton: some View {
             ActionButtons.AspectFill { isAspectFilled in
                 Group {
@@ -46,7 +44,6 @@ extension VideoPlayer.Overlay {
             }
         }
 
-        @ViewBuilder
         private var audioTrackMenu: some View {
             ActionButtons.Audio { audioTrackSelected in
                 Group {
@@ -89,14 +86,12 @@ extension VideoPlayer.Overlay {
             }
         }
 
-        @ViewBuilder
         private var danmakuButton: some View {
             DanmakuActionButton()
                 .frame(width: 45, height: 45)
                 .contentShape(Rectangle())
         }
 
-        @ViewBuilder
         private var playbackSpeedMenu: some View {
             ActionButtons.PlaybackSpeedMenu {
                 Image(systemName: "speedometer")
@@ -127,7 +122,6 @@ extension VideoPlayer.Overlay {
             }
         }
 
-        @ViewBuilder
         private var subtitleTrackMenu: some View {
             ActionButtons.Subtitles { subtitleTrackSelected in
                 Group {

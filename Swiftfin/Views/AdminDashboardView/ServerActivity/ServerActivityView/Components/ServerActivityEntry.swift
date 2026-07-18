@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -54,11 +54,10 @@ extension ServerActivityView {
 
         // MARK: - User Image
 
-        @ViewBuilder
         private var rowContent: some View {
             HStack {
                 VStack(alignment: .leading) {
-                    /// Event Severity & Username / System
+                    // Event Severity & Username / System
                     HStack(spacing: 8) {
                         Image(systemName: viewModel.log.severity?.systemImage ?? "questionmark.circle")
                             .foregroundStyle(viewModel.log.severity?.color ?? .gray)
@@ -71,7 +70,7 @@ extension ServerActivityView {
                     }
                     .font(.headline)
 
-                    /// Event Name
+                    // Event Name
                     Text(viewModel.log.name ?? .emptyDash)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)

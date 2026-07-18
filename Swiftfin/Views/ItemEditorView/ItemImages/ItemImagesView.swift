@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -113,7 +113,6 @@ struct ItemImagesView: View {
 
     // MARK: - Image View
 
-    @ViewBuilder
     private var imageView: some View {
         ScrollView {
             ForEach(ImageType.allCases.sorted(using: \.rawValue), id: \.self) { imageType in
@@ -151,7 +150,6 @@ struct ItemImagesView: View {
 
     // MARK: - Section Header
 
-    @ViewBuilder
     private func sectionHeader(for imageType: ImageType) -> some View {
         HStack {
             Text(imageType.displayTitle)
@@ -191,7 +189,6 @@ struct ItemImagesView: View {
 
     // TODO: instead of using `posterStyle`, should be sized based on
     //       the image type and just ignore and poster styling
-    @ViewBuilder
     private func imageButton(
         imageInfo: ImageInfo,
         onSelect: @escaping () -> Void

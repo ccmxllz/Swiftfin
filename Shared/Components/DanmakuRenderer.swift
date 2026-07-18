@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import DanmakuKit
@@ -13,7 +13,7 @@ import Foundation
 import Logging
 import UIKit
 
-// 避免与项目中的 DanmakuView 冲突
+/// 避免与项目中的 DanmakuView 冲突
 typealias DanmakuKitView = DanmakuKit.DanmakuView
 
 // MARK: - DanmakuRenderer (DanmakuKit Implementation)
@@ -39,7 +39,7 @@ final class DanmakuRenderer: ObservableObject {
     private var displayAreaPosition: String = "top"
     private var trackCount: Int = 4
 
-    // 字体配置
+    /// 字体配置
     private let fontConfig = DanmakuFontConfiguration()
 
     // MARK: - Initialization

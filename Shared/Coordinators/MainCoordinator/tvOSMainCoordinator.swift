@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Factory
@@ -70,7 +70,7 @@ final class MainCoordinator: NavigationCoordinatable {
         logger.info("Signed in")
 
         withAnimation(.linear(duration: 0.1)) {
-            let _ = root(\.mainTab)
+            _ = root(\.mainTab)
         }
     }
 
@@ -79,7 +79,7 @@ final class MainCoordinator: NavigationCoordinatable {
         logger.info("Signed out")
 
         withAnimation(.linear(duration: 0.1)) {
-            let _ = root(\.selectUser)
+            _ = root(\.selectUser)
         }
     }
 

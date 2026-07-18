@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import JellyfinAPI
@@ -54,7 +54,6 @@ struct AddTaskTriggerView: View {
 
     // MARK: - View for TaskTriggerType.daily
 
-    @ViewBuilder
     private var dailyView: some View {
         TimeRow(taskTriggerInfo: $taskTriggerInfo)
     }
@@ -69,7 +68,6 @@ struct AddTaskTriggerView: View {
 
     // MARK: - View for TaskTriggerType.interval
 
-    @ViewBuilder
     private var intervalView: some View {
         IntervalRow(taskTriggerInfo: $taskTriggerInfo)
     }

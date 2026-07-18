@@ -3,7 +3,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
-// Copyright (c) 2025 Jellyfin & Jellyfin Contributors
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import Defaults
@@ -104,11 +104,15 @@ extension Defaults.Keys {
 
     /// The accent color default for user contexts.
     /// Only use for `set`, use `accentColor` for `get`.
-    static var userAccentColor: Key<Color> { UserKey("userAccentColor", default: .jellyfinPurple) }
+    static var userAccentColor: Key<Color> {
+        UserKey("userAccentColor", default: .jellyfinPurple)
+    }
 
     /// The appearance default for user contexts.
     /// /// Only use for `set`, use `appearance` for `get`.
-    static var userAppearance: Key<AppAppearance> { UserKey("userAppearance", default: .system) }
+    static var userAppearance: Key<AppAppearance> {
+        UserKey("userAppearance", default: .system)
+    }
 
     enum Customization {
 
@@ -267,7 +271,7 @@ extension Defaults.Keys {
         }
     }
 
-    // Experimental settings
+    /// Experimental settings
     enum Experimental {
 
         static let downloads: Key<Bool> = UserKey("experimentalDownloads", default: false)
