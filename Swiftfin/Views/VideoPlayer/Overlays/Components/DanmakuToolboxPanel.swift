@@ -244,6 +244,8 @@ extension VideoPlayer.Overlay {
             ("maiduidui", "埋堆堆"),
             ("aiyifan", "爱壹帆"),
             ("animeko", "Animeko"),
+            ("bahamut", "巴哈"),
+            ("hanjutv", "韩剧TV"),
         ]
 
         // MARK: - Helpers
