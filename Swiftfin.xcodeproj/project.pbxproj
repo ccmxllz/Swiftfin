@@ -417,6 +417,7 @@
 		5F1DF63B2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */; };
 		5F1DF63C2DF3372800DBFC90 /* DanmakuViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */; };
 		5F1DF63E2DF337B000DBFC90 /* DanmakuActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */; };
+		5F251E112DF70C0200F5EDCA /* DanmakuToolboxPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F251E122DF70C0200F5EDCA /* DanmakuToolboxPanel.swift */; };
 		5F251E0A2DF5095B00F5EDCA /* DanmakuKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5F251E092DF5095B00F5EDCA /* DanmakuKit */; };
 		5F251E0C2DF50AE300F5EDCA /* DanmakuTextCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F251E0B2DF50AE300F5EDCA /* DanmakuTextCellModel.swift */; };
 		5F251E0D2DF50AE300F5EDCA /* DanmakuTextCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F251E0B2DF50AE300F5EDCA /* DanmakuTextCellModel.swift */; };
@@ -1620,6 +1621,7 @@
 		5F1DF6372DF3371400DBFC90 /* DanmakuService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuService.swift; sourceTree = "<group>"; };
 		5F1DF63A2DF3372800DBFC90 /* DanmakuViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuViewModel.swift; sourceTree = "<group>"; };
 		5F1DF63D2DF337B000DBFC90 /* DanmakuActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuActionButton.swift; sourceTree = "<group>"; };
+		5F251E122DF70C0200F5EDCA /* DanmakuToolboxPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuToolboxPanel.swift; sourceTree = "<group>"; };
 		5F251E0B2DF50AE300F5EDCA /* DanmakuTextCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanmakuTextCellModel.swift; sourceTree = "<group>"; };
 		6213388F265F83A900A81A2A /* MediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaView.swift; sourceTree = "<group>"; };
 		621338922660107500A81A2A /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
@@ -4422,6 +4424,7 @@
 				E1E9017E28DAB15F001B1594 /* BarActionButtons.swift */,
 				E11245B328D97D5D00D8A977 /* BottomBarView.swift */,
 				E1CFE27F28FA606800B7D34C /* ChapterTrack.swift */,
+				5F251E122DF70C0200F5EDCA /* DanmakuToolboxPanel.swift */,
 				E1B33ECE28EB6EA90073B0FD /* OverlayMenu.swift */,
 				E1721FAC28FB801000762992 /* PlaybackButtons */,
 				E1721FAB28FB7CCA00762992 /* Timestamp */,
@@ -6392,6 +6395,7 @@
 				E18845F526DD631E00B0C5B7 /* BaseItemDto+Poster.swift in Sources */,
 				4E5071D72CFCEB75003FA2AD /* TagEditorViewModel.swift in Sources */,
 				E1B33ECF28EB6EA90073B0FD /* OverlayMenu.swift in Sources */,
+				5F251E112DF70C0200F5EDCA /* DanmakuToolboxPanel.swift in Sources */,
 				E146A9D82BE6E9830034DA1E /* StoredValue.swift in Sources */,
 				6220D0B426D5ED8000B8E046 /* LibraryCoordinator.swift in Sources */,
 				4EFAC1362D1FB1A100E40880 /* AccessTagSearchResultsSection.swift in Sources */,

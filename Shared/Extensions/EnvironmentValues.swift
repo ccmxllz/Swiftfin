@@ -26,6 +26,9 @@ extension EnvironmentValues {
     var isPresentingOverlay: Binding<Bool> = .constant(false)
 
     @Entry
+    var isPresentingDanmakuToolbox: Binding<Bool> = .constant(false)
+
+    @Entry
     var isScrubbing: Binding<Bool> = .constant(false)
 
     @Entry

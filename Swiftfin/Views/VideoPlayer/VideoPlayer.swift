@@ -96,6 +96,8 @@ struct VideoPlayer: View {
     @State
     private var isPresentingOverlay: Bool = false
     @State
+    private var isPresentingDanmakuToolbox: Bool = false
+    @State
     private var isScrubbing: Bool = false
     @State
     private var playbackSpeed: Double = 1
@@ -202,6 +204,7 @@ struct VideoPlayer: View {
             .environmentObject(videoPlayerManager.proxy)
             .environment(\.aspectFilled, $isAspectFilled)
             .environment(\.isPresentingOverlay, $isPresentingOverlay)
+            .environment(\.isPresentingDanmakuToolbox, $isPresentingDanmakuToolbox)
             .environment(\.isScrubbing, $isScrubbing)
             .environment(\.playbackSpeed, $playbackSpeed)
     }

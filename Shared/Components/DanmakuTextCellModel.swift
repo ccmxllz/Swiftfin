@@ -47,7 +47,11 @@ class DanmakuTextCellModel: DanmakuCellModel {
     init(danmakuItem: DanmakuItem, settings: DanmakuRenderSettings, font: UIFont) {
         self.identifier = String(danmakuItem.id)
         self.text = danmakuItem.content
-        self.textColor = UIColor(danmakuItem.displayColor).danmakuBrightened()
+        if settings.colorEnabled {
+            self.textColor = UIColor(danmakuItem.displayColor).danmakuBrightened()
+        } else {
+            self.textColor = .white
+        }
         self.font = font
         self.useSoftEdge = settings.smoothMode
 

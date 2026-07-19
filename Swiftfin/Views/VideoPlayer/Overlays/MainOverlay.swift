@@ -22,6 +22,9 @@ extension VideoPlayer {
         @Environment(\.isPresentingOverlay)
         @Binding
         private var isPresentingOverlay
+        @Environment(\.isPresentingDanmakuToolbox)
+        @Binding
+        private var isPresentingDanmakuToolbox
         @Environment(\.isScrubbing)
         @Binding
         private var isScrubbing: Bool
@@ -116,10 +119,17 @@ extension VideoPlayer {
                 }
             }
             .onChange(of: overlayTimer.isActive) { newValue in
-                guard !newValue, !isScrubbing else { return }
+                guard !newValue, !isScrubbing, !isPresentingDanmakuToolbox else { return }
 
                 withAnimation(.linear(duration: 0.3)) {
                     isPresentingOverlay = false
+                }
+            }
+            .onChange(of: isPresentingDanmakuToolbox) { presenting in
+                if presenting {
+                    overlayTimer.stop()
+                } else if isPresentingOverlay {
+                    overlayTimer.start(5)
                 }
             }
         }

@@ -17,6 +17,7 @@ struct DanmakuRenderSettings: Equatable {
     var fontSize: CGFloat
     var enhancedShadow: Bool
     var smoothMode: Bool
+    var colorEnabled: Bool
     var trackCount: Int
     var displayAreaRatio: CGFloat
     var displayAreaPosition: String
@@ -28,6 +29,7 @@ struct DanmakuRenderSettings: Equatable {
             fontSize: CGFloat(Defaults[.VideoPlayer.Overlay.danmakuFontSize]),
             enhancedShadow: Defaults[.VideoPlayer.Overlay.danmakuEnhancedShadow],
             smoothMode: Defaults[.VideoPlayer.Overlay.danmakuSmoothMode],
+            colorEnabled: Defaults[.VideoPlayer.Overlay.danmakuColorEnabled],
             trackCount: Defaults[.VideoPlayer.Overlay.danmakuTrackCount],
             displayAreaRatio: CGFloat(Defaults[.VideoPlayer.Overlay.danmakuDisplayArea]),
             displayAreaPosition: Defaults[.VideoPlayer.Overlay.danmakuAreaPosition]

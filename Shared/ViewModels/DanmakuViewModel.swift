@@ -339,18 +339,55 @@ final class DanmakuViewModel: ViewModel, Stateful {
         let dueItems = items(inProgressRange: startMs ... emitUntilMs)
         guard !dueItems.isEmpty else { return }
 
-        let batch: [DanmakuItem]
-        if dueItems.count <= maxEmitPerTick {
-            batch = dueItems
-        } else {
-            batch = Array(dueItems.prefix(maxEmitPerTick))
+        var batch: [DanmakuItem] = []
+        var lastScannedProgress = emittedUntilMs
+        let featuredOnly = Defaults[.VideoPlayer.Overlay.danmakuFeaturedOnly]
+        let showTop = Defaults[.VideoPlayer.Overlay.danmakuShowTopComments]
+        let showBottom = Defaults[.VideoPlayer.Overlay.danmakuShowBottomComments]
+        let showScroll = Defaults[.VideoPlayer.Overlay.danmakuShowScrollComments]
+
+        for item in dueItems {
+            lastScannedProgress = item.progress
+            guard isAllowed(
+                item,
+                featuredOnly: featuredOnly,
+                showTop: showTop,
+                showBottom: showBottom,
+                showScroll: showScroll
+            ) else { continue }
+
+            batch.append(item)
+            if batch.count >= maxEmitPerTick {
+                break
+            }
         }
 
-        if let last = batch.last {
-            emittedUntilMs = last.progress
+        emittedUntilMs = lastScannedProgress
+
+        if !batch.isEmpty {
+            publishCurrentDanmakus(batch)
+        }
+    }
+
+    private func isAllowed(
+        _ item: DanmakuItem,
+        featuredOnly: Bool,
+        showTop: Bool,
+        showBottom: Bool,
+        showScroll: Bool
+    ) -> Bool {
+        if featuredOnly, !item.isHighQuality {
+            return false
         }
 
-        publishCurrentDanmakus(batch)
+        switch item.mode {
+        case 4:
+            return showBottom
+        case 5:
+            return showTop
+        default:
+            return showScroll
+        }
     }
 
     @MainActor
