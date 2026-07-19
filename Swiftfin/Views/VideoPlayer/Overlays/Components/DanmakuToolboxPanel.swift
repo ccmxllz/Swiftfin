@@ -246,6 +246,7 @@ extension VideoPlayer.Overlay {
             ("animeko", "Animeko"),
             ("bahamut", "巴哈"),
             ("hanjutv", "韩剧TV"),
+            ("migu", "咪咕"),
         ]
 
         // MARK: - Helpers
