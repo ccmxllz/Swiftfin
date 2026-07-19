@@ -217,16 +217,31 @@ extension VideoPlayer.Overlay {
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.55))
 
-                Picker("弹幕平台", selection: $platform) {
-                    Text("腾讯").tag("tencent")
-                    Text("B站").tag("bilibili")
-                    Text("优酷").tag("youku")
-                    Text("爱奇艺").tag("iqiyi")
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 72), spacing: 8)],
+                    alignment: .leading,
+                    spacing: 8
+                ) {
+                    ForEach(Self.danmakuPlatforms, id: \.id) { item in
+                        modeChip(title: item.title, selected: platform == item.id) {
+                            platform = item.id
+                        }
+                    }
                 }
-                .pickerStyle(.segmented)
-                .colorScheme(.dark)
             }
         }
+
+        private static let danmakuPlatforms: [(id: String, title: String)] = [
+            ("tencent", "腾讯"),
+            ("bilibili", "B站"),
+            ("youku", "优酷"),
+            ("iqiyi", "爱奇艺"),
+            ("mgtv", "芒果"),
+            ("renren", "人人"),
+            ("sohu", "搜狐"),
+            ("xigua", "西瓜"),
+            ("leshi", "乐视"),
+        ]
 
         // MARK: - Helpers
 
