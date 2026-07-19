@@ -37,38 +37,16 @@ struct DanmakuFontConfiguration {
 
     // MARK: - Font Names
 
-    /// Prefer Medium — closer to Tencent's clean luminous weight than Semibold.
+    /// 略偏粗（Semibold）更接近腾讯「柔和透亮」体感，仍不至于发胖
     private let preferredFontNames: [String] = [
-        "PingFangSC-Medium",
-        "PingFangSC-Regular",
-        "HiraginoSansGB-W3",
         "PingFangSC-Semibold",
+        "PingFangTC-Semibold",
+        "PingFangSC-Medium",
+        "PingFangTC-Medium",
+        "HiraginoSansGB-W6",
         "STHeitiSC-Medium",
         "HelveticaNeue-Medium",
     ]
-
-    // MARK: - Shadow Configuration
-
-    struct ShadowConfiguration {
-        let opacity: Float
-        let radius: CGFloat
-        let offset: CGSize
-        let color: CGColor
-
-        static let standard = ShadowConfiguration(
-            opacity: 0.45,
-            radius: 1.5,
-            offset: CGSize(width: 0, height: 1.0),
-            color: UIColor.black.cgColor
-        )
-
-        static let enhanced = ShadowConfiguration(
-            opacity: 0.55,
-            radius: 2.0,
-            offset: CGSize(width: 0, height: 1.2),
-            color: UIColor.black.cgColor
-        )
-    }
 
     // MARK: - Methods
 
@@ -78,30 +56,26 @@ struct DanmakuFontConfiguration {
                 return font
             }
         }
-        return UIFont.systemFont(ofSize: size, weight: .medium)
+        return UIFont.systemFont(ofSize: size, weight: .semibold)
     }
 
-    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .medium) -> Font {
-        if UIFont(name: "PingFangSC-Medium", size: size) != nil {
+    func getSwiftUIFont(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
+        if UIFont(name: "PingFangSC-Semibold", size: size) != nil {
+            return .custom("PingFangSC-Semibold", size: size)
+        } else if UIFont(name: "PingFangSC-Medium", size: size) != nil {
             return .custom("PingFangSC-Medium", size: size)
-        } else if UIFont(name: "PingFangSC-Regular", size: size) != nil {
-            return .custom("PingFangSC-Regular", size: size)
         }
         return .system(size: size, weight: weight, design: .default)
-    }
-
-    func getShadowConfiguration(enhanced: Bool = false) -> ShadowConfiguration {
-        enhanced ? .enhanced : .standard
     }
 
     func calculateTextWidth(text: String, font: UIFont) -> CGFloat {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
-            .kern: 0.2,
+            .kern: 0.1,
         ]
 
         let size = (text as NSString).size(withAttributes: attributes)
-        let padding: CGFloat = 8.0
+        let padding: CGFloat = 6.0
         return ceil(size.width) + padding
     }
 

@@ -47,8 +47,14 @@ struct DanmakuItem: Identifiable, Codable, Hashable {
     let ctime: Int // 创建时间
     let showWeight: Int // 权重
     let pool: Int // 弹幕池
-    /// 渐变色（hex，无 #），≥2 且颜色不同时纵向渐变绘制
+    /// 渐变色（hex，无 #），≥2 且颜色不同时左→右渐变绘制
     let gradientColors: [String]?
+    /// 气泡头像 URL（腾讯 bubble_head）
+    let bubbleHead: String?
+    /// 气泡等级角标 URL（腾讯 bubble_level）
+    let bubbleLevel: String?
+    /// VIP 等级（无 bubble_level 图时可用于文字角标）
+    let vipDegree: Int?
 
     // MARK: - Computed Properties (保持兼容性)
 
