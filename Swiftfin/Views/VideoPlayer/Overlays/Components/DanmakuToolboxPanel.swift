@@ -241,6 +241,9 @@ extension VideoPlayer.Overlay {
             ("sohu", "搜狐"),
             ("xigua", "西瓜"),
             ("leshi", "乐视"),
+            ("maiduidui", "埋堆堆"),
+            ("aiyifan", "爱壹帆"),
+            ("animeko", "Animeko"),
         ]
 
         // MARK: - Helpers
