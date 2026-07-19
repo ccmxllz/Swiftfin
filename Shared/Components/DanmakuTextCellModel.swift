@@ -32,6 +32,8 @@ class DanmakuTextCellModel: DanmakuCellModel {
     var text = ""
     var font = UIFont.systemFont(ofSize: 17, weight: .medium)
     var textColor = UIColor.white
+    /// 渐变填充色（腾讯 content_style.gradient_colors，左→右）；nil 则单色 textColor
+    var gradientColors: [UIColor]?
     /// Outer rim (Tencent-style thin black outline).
     var outlineColor = UIColor.black.withAlphaComponent(0.85)
     var outlineWidth: CGFloat = 2.2
@@ -49,8 +51,15 @@ class DanmakuTextCellModel: DanmakuCellModel {
         self.text = danmakuItem.content
         if settings.colorEnabled {
             self.textColor = UIColor(danmakuItem.displayColor).danmakuBrightened()
+            if let hexes = danmakuItem.resolvedGradientHexes {
+                let colors = hexes.compactMap { UIColor(danmakuHex: $0)?.danmakuBrightened() }
+                if colors.count >= 2 {
+                    self.gradientColors = colors
+                }
+            }
         } else {
             self.textColor = .white
+            self.gradientColors = nil
         }
         self.font = font
         self.useSoftEdge = settings.smoothMode
@@ -129,39 +138,40 @@ extension DanmakuTextCellModel: Equatable {
     }
 }
 
-// MARK: - Color Brightness
+extension UIColor {
 
-private extension UIColor {
     /// Lift near-greys / dim API colors toward a Tencent-like luminous look.
     func danmakuBrightened() -> UIColor {
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            // Near-white / grey comments → pure bright white.
-            if saturation < 0.12, brightness > 0.7 {
-                return UIColor(white: 1.0, alpha: 1.0)
-            }
-            // Colored comments: bump brightness a bit, keep hue.
-            let lifted = min(1.0, brightness * 1.08 + 0.04)
-            let sat = min(1.0, saturation * 1.05)
-            return UIColor(hue: hue, saturation: sat, brightness: lifted, alpha: 1.0)
+        var h: CGFloat = 0
+        var s: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        guard getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return self }
+        // Near-grey: bump brightness so white/light colors read 透亮.
+        if s < 0.12 {
+            return UIColor(hue: h, saturation: s, brightness: min(1, b * 1.08 + 0.04), alpha: a)
         }
+        return UIColor(hue: h, saturation: min(1, s * 1.05), brightness: min(1, b * 1.06), alpha: a)
+    }
 
-        var white: CGFloat = 0
-        if getWhite(&white, alpha: &alpha) {
-            return UIColor(white: min(1.0, white * 1.05 + 0.02), alpha: 1.0)
+    /// Parse RRGGBB / #RRGGBB / RGB hex from danmu API.
+    convenience init?(danmakuHex: String) {
+        var hex = danmakuHex.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "#", with: "")
+        if hex.count == 3 {
+            hex = hex.map { "\($0)\($0)" }.joined()
         }
-
-        return self
+        guard hex.count == 6, let value = UInt32(hex, radix: 16) else { return nil }
+        let r = CGFloat((value >> 16) & 0xFF) / 255
+        let g = CGFloat((value >> 8) & 0xFF) / 255
+        let b = CGFloat(value & 0xFF) / 255
+        self.init(red: r, green: g, blue: b, alpha: 1)
     }
 }
 
 // MARK: - DanmakuTextCell
 
-/// DanmakuKit 弹幕文本视图 — multi-pass draw for Tencent-like 透亮 outline.
+/// DanmakuKit 弹幕文本视图 — multi-pass draw for Tencent-like 透亮 outline + optional gradient fill.
 class DanmakuTextCell: DanmakuCell {
 
     required init(frame: CGRect) {
@@ -215,14 +225,92 @@ class DanmakuTextCell: DanmakuCell {
         ]
         text.draw(at: origin, withAttributes: outlineStroke)
 
-        // Pass 3: luminous fill on top — high opacity for 透亮 whites/colors.
-        let fillColor = model.textColor.withAlphaComponent(model.textAlpha)
-        let fillAttrs: [NSAttributedString.Key: Any] = [
-            .font: model.font,
-            .foregroundColor: fillColor,
-            .kern: model.useSoftEdge ? 0.2 : 0.0,
-        ]
-        text.draw(at: origin, withAttributes: fillAttrs)
+        // Pass 3: solid or horizontal (左→右) gradient fill.
+        // 注意：DanmakuAsyncLayer 已在 UIGraphicsBeginImageContext 中调用本方法，
+        // 禁止再套一层 BeginImageContext，否则 destinationIn 裁切会失败，变成整块色条。
+        if let gradient = model.gradientColors, gradient.count >= 2 {
+            drawGradientFill(
+                in: context,
+                size: size,
+                text: text,
+                origin: origin,
+                font: model.font,
+                colors: gradient,
+                alpha: model.textAlpha,
+                kern: model.useSoftEdge ? 0.2 : 0.0
+            )
+        } else {
+            let fillColor = model.textColor.withAlphaComponent(model.textAlpha)
+            let fillAttrs: [NSAttributedString.Key: Any] = [
+                .font: model.font,
+                .foregroundColor: fillColor,
+                .kern: model.useSoftEdge ? 0.2 : 0.0,
+            ]
+            text.draw(at: origin, withAttributes: fillAttrs)
+        }
+    }
+
+    /// 生成左→右渐变 UIImage，再用 patternColor 走 text.draw（只填字形，不会铺满 cell）。
+    private func drawGradientFill(
+        in context: CGContext,
+        size: CGSize,
+        text: NSString,
+        origin: CGPoint,
+        font: UIFont,
+        colors: [UIColor],
+        alpha: CGFloat,
+        kern: CGFloat
+    ) {
+        let solidFallback: () -> Void = {
+            text.draw(at: origin, withAttributes: [
+                .font: font,
+                .foregroundColor: (colors.first ?? .white).withAlphaComponent(alpha),
+                .kern: kern,
+            ])
+        }
+
+        guard size.width > 1, size.height > 1,
+              let gradientImage = makeHorizontalGradientUIImage(size: size, colors: colors, alpha: alpha)
+        else {
+            solidFallback()
+            return
+        }
+
+        context.saveGState()
+        context.setPatternPhase(.zero)
+        text.draw(at: origin, withAttributes: [
+            .font: font,
+            .foregroundColor: UIColor(patternImage: gradientImage),
+            .kern: kern,
+        ])
+        context.restoreGState()
+    }
+
+    private func makeHorizontalGradientUIImage(size: CGSize, colors: [UIColor], alpha: CGFloat) -> UIImage? {
+        let scale = contentScaleFactor > 0 ? contentScaleFactor : UIScreen.main.scale
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = scale
+        format.opaque = false
+
+        let layer = CAGradientLayer()
+        layer.frame = CGRect(origin: .zero, size: size)
+        layer.colors = colors.map { $0.withAlphaComponent(alpha).cgColor }
+        layer.locations = (0 ..< colors.count).map {
+            NSNumber(value: colors.count == 1 ? 0 : Double($0) / Double(colors.count - 1))
+        }
+        // 腾讯弹幕渐变：左 → 右
+        layer.startPoint = CGPoint(x: 0, y: 0.5)
+        layer.endPoint = CGPoint(x: 1, y: 0.5)
+
+        return UIGraphicsImageRenderer(size: size, format: format).image { ctx in
+            let cg = ctx.cgContext
+            // layer.render 进位图时默认 CG 取向，翻转到 UIKit（与 text.draw 一致）
+            cg.saveGState()
+            cg.translateBy(x: 0, y: size.height)
+            cg.scaleBy(x: 1, y: -1)
+            layer.render(in: cg)
+            cg.restoreGState()
+        }
     }
 
     override func didDisplay(_ finished: Bool) {}

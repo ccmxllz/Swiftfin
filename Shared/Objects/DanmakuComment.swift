@@ -47,6 +47,8 @@ struct DanmakuItem: Identifiable, Codable, Hashable {
     let ctime: Int // 创建时间
     let showWeight: Int // 权重
     let pool: Int // 弹幕池
+    /// 渐变色（hex，无 #），≥2 且颜色不同时纵向渐变绘制
+    let gradientColors: [String]?
 
     // MARK: - Computed Properties (保持兼容性)
 
@@ -64,6 +66,20 @@ struct DanmakuItem: Identifiable, Codable, Hashable {
 
     var isHighQuality: Bool {
         score > 51.0
+    }
+
+    /// 可用于渐变绘制的色值；不足 2 个不同色则返回 nil
+    var resolvedGradientHexes: [String]? {
+        guard let gradientColors, gradientColors.count >= 2 else { return nil }
+        let cleaned = gradientColors
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "#", with: "") }
+            .filter { !$0.isEmpty }
+        guard cleaned.count >= 2 else { return nil }
+        let unique = Set(cleaned.map { $0.uppercased() })
+        if unique.count < 2 {
+            return nil
+        }
+        return cleaned
     }
 
     // MARK: - Swiftfin 适配属性
